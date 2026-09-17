@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Background square with rounded corners -->
+  <rect width="100" height="100" rx="18" fill="#0f1117"/>
+  <!-- Border -->
+  <rect width="100" height="100" rx="18" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.15"/>
+  <!-- Red triangle (bottom-left) replacing the old green -->
+  <polygon points="0,100 48,100 0,52" fill="#e84040" opacity="0.95"/>
+  <!-- AR text -->
+  <text x="50" y="58" text-anchor="middle" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="800" font-size="36" fill="#ffffff" letter-spacing="-1">AR</text>
+</svg>

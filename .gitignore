@@ -1,0 +1,8 @@
+# PHP mail handler — contains sensitive credentials, never push to public repo
+send.php
+PHPMailer/
+
+# XAMPP / local env
+*.log
+.DS_Store
+Thumbs.db
