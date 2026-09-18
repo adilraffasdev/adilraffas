@@ -78,8 +78,8 @@
             const finance = DB.get('finance');
             const transactions = finance.transactions || [];
 
-            const totalIncome = transactions.filter(t => t.type === 'Income').reduce((s, t) => s + t.amount, 0);
-            const totalExpenses = transactions.filter(t => t.type === 'Expense').reduce((s, t) => s + t.amount, 0);
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+            const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
             const netProfit = totalIncome - totalExpenses;
 
             document.getElementById('statsGrid').innerHTML = `
@@ -101,7 +101,7 @@
             transactions.forEach(t => {
                 const m = t.date.substring(0, 7);
                 if (!monthData[m]) monthData[m] = { Income: 0, Expense: 0 };
-                if (t.type === 'Income') monthData[m].Income += t.amount;
+                if (t.type === 'income') monthData[m].Income += t.amount;
                 else monthData[m].Expense += t.amount;
             });
             const labels = Object.keys(monthData).sort();
@@ -114,7 +114,7 @@
             transactions.forEach(t => {
                 const cat = t.category || 'Other';
                 if (!catMap[cat]) catMap[cat] = { Income: 0, Expense: 0 };
-                if (t.type === 'Income') catMap[cat].Income += t.amount;
+                if (t.type === 'income') catMap[cat].Income += t.amount;
                 else catMap[cat].Expense += t.amount;
             });
             const catLabels = Object.keys(catMap).sort();
@@ -173,7 +173,7 @@
             document.getElementById('recentActivity').innerHTML = recent.length
                 ? recent.map(t => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
                     <span>${t.description}</span>
-                    <span style="color:${t.type === 'Income' ? 'var(--success)' : 'var(--danger)'};">${t.type === 'Income' ? '+' : '-'}${t.amount.toLocaleString()} MAD</span>
+                    <span style="color:${t.type === 'income' ? 'var(--success)' : 'var(--danger)'};">${t.type === 'income' ? '+' : '-'}${t.amount.toLocaleString()} MAD</span>
                 </div>`).join('')
                 : '<p style="padding:16px;text-align:center;">No transactions yet</p>';
         }
@@ -181,6 +181,7 @@
     </script>
 </body>
 </html>
+
 
 
 

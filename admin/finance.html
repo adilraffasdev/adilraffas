@@ -26,8 +26,8 @@
                     <h2>Finance</h2>
                 </div>
                 <div class="topbar-actions">
-                    <button class="btn btn-success" onclick="openModal('Income')"><i class="fa-solid fa-plus"></i> Ajouter un revenu</button>
-                    <button class="btn btn-danger" onclick="openModal('Expense')"><i class="fa-solid fa-plus"></i> Ajouter une dépense</button>
+                    <button class="btn btn-success" onclick="openModal('income')"><i class="fa-solid fa-plus"></i> Ajouter un revenu</button>
+                    <button class="btn btn-danger" onclick="openModal('expense')"><i class="fa-solid fa-plus"></i> Ajouter une dépense</button>
                 </div>
             </div>
 
@@ -46,8 +46,8 @@
 
             <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
                 <button class="btn btn-sm btn-primary" id="filterAll" onclick="setFilter('all')">All</button>
-                <button class="btn btn-sm btn-success" id="filterIncome" onclick="setFilter('Income')">Revenu</button>
-                <button class="btn btn-sm btn-danger" id="filterExpense" onclick="setFilter('Expense')">Dépense</button>
+                <button class="btn btn-sm btn-success" id="filterIncome" onclick="setFilter('income')">Revenu</button>
+                <button class="btn btn-sm btn-danger" id="filterExpense" onclick="setFilter('expense')">Dépense</button>
             </div>
 
             <div class="card">
@@ -123,8 +123,8 @@
 
         function render() {
             const transactions = getFinance();
-            const totalIncome = transactions.filter(t => t.type === 'Income').reduce((s, t) => s + t.amount, 0);
-            const totalExpenses = transactions.filter(t => t.type === 'Expense').reduce((s, t) => s + t.amount, 0);
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+            const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
             const netProfit = totalIncome - totalExpenses;
 
             document.getElementById('financeStats').innerHTML = `
@@ -139,7 +139,7 @@
             transactions.forEach(t => {
                 const m = t.date.substring(0, 7);
                 if (!monthData[m]) monthData[m] = { Revenu: 0, Dépense: 0 };
-                if (t.type === 'Income') monthData[m].Revenu += t.amount;
+                if (t.type === 'income') monthData[m].Revenu += t.amount;
                 else monthData[m].Dépense += t.amount;
             });
             const labels = Object.keys(monthData).sort();
@@ -201,10 +201,10 @@
                 ? transactions.map(t => `
                     <tr>
                         <td style="font-size:0.85rem;color:var(--text-muted);">${t.date}</td>
-                        <td>${t.type === 'Income' ? '<span class="badge badge-success">Revenu</span>' : '<span class="badge badge-danger">Dépense</span>'}</td>
+                        <td>${t.type === 'income' ? '<span class="badge badge-success">Revenu</span>' : '<span class="badge badge-danger">Dépense</span>'}</td>
                         <td>${t.category || '-'}</td>
                         <td>${t.description}</td>
-                        <td style="text-align:right;font-weight:600;color:${t.type === 'Income' ? 'var(--success)' : 'var(--danger)'};">${t.type === 'Income' ? '+' : '-'}${t.amount.toLocaleString()} MAD</td>
+                        <td style="text-align:right;font-weight:600;color:${t.type === 'income' ? 'var(--success)' : 'var(--danger)'};">${t.type === 'income' ? '+' : '-'}${t.amount.toLocaleString()} MAD</td>
                         <td>
                             <button class="btn btn-sm btn-secondary" onclick="editTransaction(${t.id})"><i class="fa-solid fa-pen"></i></button>
                             <button class="btn btn-sm btn-danger" onclick="deleteTransaction(${t.id})"><i class="fa-solid fa-trash"></i></button>
@@ -216,9 +216,9 @@
 
         function setFilter(type) {
             filterType = type;
-            ['all','Income','Expense'].forEach(t => {
+            ['all','income','expense'].forEach(t => {
                 const btn = document.getElementById('filter' + t.charAt(0).toUpperCase() + t.slice(1));
-                if (btn) btn.className = 'btn btn-sm ' + (t === type ? (t === 'Income' ? 'btn-success' : t === 'Expense' ? 'btn-danger' : 'btn-primary') : 'btn-secondary');
+                if (btn) btn.className = 'btn btn-sm ' + (t === type ? (t === 'income' ? 'btn-success' : t === 'expense' ? 'btn-danger' : 'btn-primary') : 'btn-secondary');
             });
             renderTable();
         }
@@ -273,7 +273,7 @@
             document.getElementById('fCategory').value = t.category || 'Other';
             document.getElementById('fAmount').value = t.amount;
             document.getElementById('fDate').value = t.date;
-            document.getElementById('modalTitle').textContent = 'Edit ' + (t.type === 'Income' ? 'Revenu' : 'Dépense');
+            document.getElementById('modalTitle').textContent = 'Edit ' + (t.type === 'income' ? 'Revenu' : 'Dépense');
             document.getElementById('modal').classList.add('open');
         }
 
@@ -288,6 +288,7 @@
     </script>
 </body>
 </html>
+
 
 
 
