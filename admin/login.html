@@ -7,62 +7,94 @@
   <title>Admin Login — Adil Raffas</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="css/admin.css">
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
     .login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%)}
     .login-card{background:var(--bg-card);border-radius:16px;padding:40px;width:100%;max-width:400px;border:1px solid var(--border);box-shadow:0 25px 50px -12px rgba(0,0,0,.5);text-align:center}
     .login-card img{height:52px;margin-bottom:16px}
     .login-card h1{font-size:1.4rem;font-weight:700;margin-bottom:6px}
-    .login-card p{color:var(--text-muted);font-size:.85rem;margin-bottom:28px}
-    .btn-login{display:inline-flex;align-items:center;gap:10px;background:#005CD8;color:#fff;border:none;padding:13px 28px;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s;width:100%;justify-content:center}
+    .login-card p.sub{color:var(--text-muted);font-size:.85rem;margin-bottom:28px}
+    .form-group{margin-bottom:16px;text-align:left}
+    .form-group label{display:block;font-size:.82rem;font-weight:600;color:var(--text-muted);margin-bottom:6px}
+    .form-control{width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.9rem}
+    .form-control:focus{outline:none;border-color:#005CD8}
+    .btn-login{display:flex;align-items:center;justify-content:center;gap:10px;background:#005CD8;color:#fff;border:none;padding:12px;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;transition:background .2s}
     .btn-login:hover{background:#0045a0}
-    .msg{color:var(--text-muted);font-size:.85rem;margin-top:16px}
+    .btn-login:disabled{opacity:.6;cursor:not-allowed}
+    .error-msg{color:#ef4444;font-size:.83rem;margin-top:12px;display:none}
   </style>
 </head>
 <body class="login-page">
   <div class="login-card">
     <img src="assets/images/logo.png" alt="Admin">
     <h1>Admin Panel</h1>
-    <p>Sign in to manage your website</p>
-    <button class="btn-login" id="loginBtn">
-      <i class="fa-solid fa-right-to-bracket"></i> Sign In
-    </button>
-    <p class="msg" id="msg"></p>
+    <p class="sub">Sign in to manage your website</p>
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" class="form-control" id="password" placeholder="Enter your password" required autofocus>
+      </div>
+      <p class="error-msg" id="errorMsg"><i class="fa-solid fa-circle-xmark"></i> Wrong password</p>
+      <button type="submit" class="btn-login" id="loginBtn">
+        <i class="fa-solid fa-right-to-bracket"></i> Sign In
+      </button>
+    </form>
   </div>
 
   <script>
     var SESSION_KEY = 'ar_admin_session';
 
-    // If already has valid session, go to dashboard immediately
-    var existing = localStorage.getItem(SESSION_KEY);
-    if (existing) {
-      try {
-        var d = JSON.parse(existing);
-        if (Date.now() - d.time < 86400000) {
-          window.location.replace('/admin/index.html');
-        } else {
-          localStorage.removeItem(SESSION_KEY);
-        }
-      } catch(e) {
-        localStorage.removeItem(SESSION_KEY);
+    // If already logged in, go to dashboard
+    try {
+      var s = JSON.parse(localStorage.getItem(SESSION_KEY));
+      if (s && Date.now() - s.t < 86400000) {
+        window.location.replace('/admin/index.html');
       }
-    }
+    } catch(e) {}
 
-    // On successful Netlify Identity login — set session and redirect
-    netlifyIdentity.on('login', function(user) {
-      netlifyIdentity.close();
-      // Store session with timestamp
-      localStorage.setItem(SESSION_KEY, JSON.stringify({
-        user: user.email,
-        time: Date.now()
-      }));
-      document.getElementById('msg').textContent = 'Redirecting...';
-      document.getElementById('loginBtn').disabled = true;
-      window.location.replace('/admin/index.html');
-    });
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var pass = document.getElementById('password').value.trim();
+      var btn  = document.getElementById('loginBtn');
+      var err  = document.getElementById('errorMsg');
 
-    document.getElementById('loginBtn').addEventListener('click', function() {
-      netlifyIdentity.open('login');
+      // Hash the entered password and compare with stored hash
+      // Password hash is set via Netlify environment variable ADMIN_HASH
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+
+      // Use Web Crypto API to hash password (SHA-256)
+      var encoder = new TextEncoder();
+      var data = encoder.encode(pass);
+      crypto.subtle.digest('SHA-256', data).then(function(hashBuffer) {
+        var hashArray = Array.from(new Uint8Array(hashBuffer));
+        var hashHex = hashArray.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+
+        // Fetch the hash from Netlify Function for comparison
+        fetch('/.netlify/functions/auth-check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hash: hashHex })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+          if (res.ok) {
+            localStorage.setItem(SESSION_KEY, JSON.stringify({ t: Date.now() }));
+            window.location.replace('/admin/index.html');
+          } else {
+            err.style.display = 'block';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
+            document.getElementById('password').value = '';
+            document.getElementById('password').focus();
+          }
+        })
+        .catch(function() {
+          err.textContent = 'Connection error. Try again.';
+          err.style.display = 'block';
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
+        });
+      });
     });
   </script>
 </body>
