@@ -1,35 +1,29 @@
 /**
- * Admin auth guard
- * Simple localStorage session check — no timing issues, no loops
+ * Admin auth guard - bulletproof version
  */
-(function() {
-  var SESSION_KEY = 'ar_admin_session';
+var SESSION_KEY = 'ar_admin_session';
 
-  // Check if session exists synchronously
-  var session = localStorage.getItem(SESSION_KEY);
-  if (!session) {
-    window.location.replace('/admin/login.html');
-    return;
-  }
-
-  // Session exists — validate it hasn't expired (24h)
+function checkAuth() {
   try {
-    var data = JSON.parse(session);
-    var age = Date.now() - data.time;
-    if (age > 86400000) { // 24 hours
-      localStorage.removeItem(SESSION_KEY);
-      window.location.replace('/admin/login.html');
-      return;
-    }
+    var raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return false;
+    var s = JSON.parse(raw);
+    if (!s || !s.t) return false;
+    // Valid for 24 hours
+    return (Date.now() - s.t) < 86400000;
   } catch(e) {
-    localStorage.removeItem(SESSION_KEY);
-    window.location.replace('/admin/login.html');
-    return;
+    return false;
   }
+}
 
-  // Add logout function globally
-  window.adminLogout = function() {
-    localStorage.removeItem(SESSION_KEY);
+// Only redirect if NOT on login page
+if (window.location.pathname.indexOf('login') === -1) {
+  if (!checkAuth()) {
     window.location.replace('/admin/login.html');
-  };
-})();
+  }
+}
+
+window.adminLogout = function() {
+  localStorage.removeItem(SESSION_KEY);
+  window.location.replace('/admin/login.html');
+};

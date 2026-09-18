@@ -78,8 +78,18 @@
         .then(function(r) { return r.json(); })
         .then(function(res) {
           if (res.ok) {
-            localStorage.setItem(SESSION_KEY, JSON.stringify({ t: Date.now() }));
-            window.location.replace('/admin/index.html');
+            var session = JSON.stringify({ t: Date.now() });
+            localStorage.setItem('ar_admin_session', session);
+            // Verify it was set
+            var check = localStorage.getItem('ar_admin_session');
+            if (check) {
+              window.location.replace('/admin/index.html');
+            } else {
+              err.textContent = 'Session error. Please try again.';
+              err.style.display = 'block';
+              btn.disabled = false;
+              btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
+            }
           } else {
             err.style.display = 'block';
             btn.disabled = false;
