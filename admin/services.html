@@ -1,0 +1,208 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/images/logo.png">
+    <title>Services — Mediasoft Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+<script src="js/auth.js"></script></head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/images/logo.png" alt="Mediasoft">
+                <span>Mediasoft</span>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav"></nav>
+            <div class="sidebar-footer" id="sidebarFooter"></div>
+        </aside>
+        <main class="main-content">
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                    <h2>Services</h2>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" onclick="openModal()"><i class="fa-solid fa-plus"></i> Add Service</button>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search services..." oninput="renderTable()">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-wrap">
+                    <table><thead><tr>
+                        <th style="width:30px"></th>
+                        <th style="width:40px">Icon</th>
+                        <th>Title</th>
+                        <th>Tags</th>
+                        <th style="width:80px">Status</th>
+                        <th style="width:80px">Order</th>
+                        <th style="width:140px">Actions</th>
+                    </tr></thead>
+                    <tbody id="servicesTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Service</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="form-group"><label>Title</label><input class="form-control" id="fTitle" required></div>
+                <div class="form-group"><label>Description</label><textarea class="form-control" id="fDesc" rows="3"></textarea></div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group"><label>Icon (FontAwesome class)</label><input class="form-control" id="fIcon" placeholder="fa-solid fa-laptop-code"></div>
+                    <div class="form-group"><label>Tags (comma separated)</label><input class="form-control" id="fTags" placeholder="React, Node.js"></div>
+                </div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group"><label>Button Text</label><input class="form-control" id="fBtnText" placeholder="Get a Quote"></div>
+                    <div class="form-group"><label>Button URL</label><input class="form-control" id="fBtnUrl" placeholder="#contact"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveService()"><i class="fa-solid fa-check"></i> Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js?2"></script>
+    <script src="js/db.js?2"></script>
+    <script>
+        initLayout('services');
+        let editingId = null;
+
+        async function init() {
+            await DB.init();
+            renderTable();
+        }
+
+        function getData() {
+            let data = DB.get('services');
+            const q = (document.getElementById('searchInput').value || '').toLowerCase();
+            if (q) data = data.filter(s => s.title.toLowerCase().includes(q));
+            return data.sort((a,b) => (a.sortOrder || 999) - (b.sortOrder || 999));
+        }
+
+        function renderTable() {
+            const data = getData();
+            document.getElementById('servicesTable').innerHTML = data.map(s => `
+                <tr draggable="true" data-id="${s.id}">
+                    <td class="drag-handle" ondragstart="dragStart(event)" draggable="true"><i class="fa-solid fa-grip-vertical"></i></td>
+                    <td><i class="${s.icon || 'fa-solid fa-circle'}" style="color:var(--primary);font-size:1.1rem;"></i></td>
+                    <td><strong>${s.title}</strong><br><small style="color:var(--text-muted);">${(s.description || '').substring(0, 60)}...</small></td>
+                    <td>${(s.tags || []).map(t => `<span class="badge badge-info">${t}</span>`).join(' ')}</td>
+                    <td><label class="toggle"><input type="checkbox" ${s.status === 'visible' ? 'checked' : ''} onchange="toggleStatus(${s.id})"><span class="toggle-slider"></span></label></td>
+                    <td style="font-size:0.8rem;color:var(--text-muted);">${s.sortOrder || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="editService(${s.id})"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteService(${s.id})"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openModal(data) {
+            document.getElementById('editId').value = data ? data.id : '';
+            document.getElementById('fTitle').value = data ? data.title : '';
+            document.getElementById('fDesc').value = data ? data.description : '';
+            document.getElementById('fIcon').value = data ? data.icon : 'fa-solid fa-laptop-code';
+            document.getElementById('fTags').value = data ? (data.tags || []).join(', ') : '';
+            document.getElementById('fBtnText').value = data ? data.btnText : 'Get a Quote';
+            document.getElementById('fBtnUrl').value = data ? data.btnUrl : '#contact';
+            document.getElementById('modalTitle').textContent = data ? 'Edit Service' : 'Add Service';
+            document.getElementById('modal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('open');
+            document.getElementById('editId').value = '';
+        }
+
+        function saveService() {
+            const id = document.getElementById('editId').value;
+            const data = {
+                title: document.getElementById('fTitle').value.trim(),
+                description: document.getElementById('fDesc').value.trim(),
+                icon: document.getElementById('fIcon').value.trim(),
+                tags: document.getElementById('fTags').value.split(',').map(t => t.trim()).filter(Boolean),
+                btnText: document.getElementById('fBtnText').value.trim(),
+                btnUrl: document.getElementById('fBtnUrl').value.trim(),
+                image: '',
+                status: 'visible'
+            };
+            if (!data.title) { DB.toast('Title is required', 'error'); return; }
+            if (id) {
+                DB.update('services', parseInt(id), data);
+                DB.toast('Service updated');
+            } else {
+                DB.add('services', data);
+                DB.toast('Service added');
+            }
+            closeModal();
+            renderTable();
+        }
+
+        function editService(id) {
+            const s = DB.getById('services', id);
+            if (s) openModal(s);
+        }
+
+        function deleteService(id) {
+            if (!confirm('Delete this service?')) return;
+            DB.delete('services', id);
+            DB.toast('Service deleted');
+            renderTable();
+        }
+
+        function toggleStatus(id) {
+            const s = DB.getById('services', id);
+            if (s) {
+                DB.update('services', id, { status: s.status === 'visible' ? 'hidden' : 'visible' });
+                DB.toast(s.status === 'visible' ? 'Service hidden' : 'Service visible');
+            }
+        }
+
+        // Drag & drop
+        let dragId = null;
+        function dragStart(e) {
+            dragId = parseInt(e.target.closest('tr').dataset.id);
+            e.dataTransfer.effectAllowed = 'move';
+        }
+        document.addEventListener('dragover', e => e.preventDefault());
+        document.addEventListener('drop', e => {
+            const tr = e.target.closest('tr');
+            if (!tr || !dragId) return;
+            const targetId = parseInt(tr.dataset.id);
+            if (dragId === targetId) return;
+            let data = getData();
+            const ids = data.map(d => d.id);
+            const from = ids.indexOf(dragId);
+            const to = ids.indexOf(targetId);
+            ids.splice(from, 1);
+            ids.splice(to, 0, dragId);
+            DB.reorder('services', ids);
+            dragId = null;
+            renderTable();
+        });
+
+        init();
+    </script>
+</body>
+</html>
+

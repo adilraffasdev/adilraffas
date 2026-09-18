@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/images/logo.png">
+  <title>Admin Login — Adil Raffas</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <!-- Netlify Identity Widget -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <style>
+    .login-page { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:20px; background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%); }
+    .login-card { background:var(--bg-card);border-radius:16px;padding:40px;width:100%;max-width:400px;border:1px solid var(--border);box-shadow:0 25px 50px -12px rgba(0,0,0,.5);text-align:center; }
+    .login-card img { height:52px; margin-bottom:16px; }
+    .login-card h1 { font-size:1.4rem; font-weight:700; margin-bottom:6px; }
+    .login-card p { color:var(--text-muted); font-size:.85rem; margin-bottom:28px; }
+    .btn-login { display:inline-flex;align-items:center;gap:10px;background:#005CD8;color:#fff;border:none;padding:13px 28px;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s;width:100%;justify-content:center; }
+    .btn-login:hover { background:#0045a0; }
+    .checking { color:var(--text-muted); font-size:.85rem; margin-top:16px; }
+  </style>
+</head>
+<body class="login-page">
+  <div class="login-card">
+    <img src="assets/images/logo.png" alt="Adil Raffas Admin">
+    <h1>Admin Panel</h1>
+    <p>Sign in with your Netlify Identity account</p>
+    <button class="btn-login" id="loginBtn" onclick="netlifyIdentity.open('login')">
+      <i class="fa-solid fa-right-to-bracket"></i> Sign In
+    </button>
+    <p class="checking" id="checkMsg"></p>
+  </div>
+
+  <script>
+    // If already logged in, redirect to dashboard
+    netlifyIdentity.on('init', function(user) {
+      if (user) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // On successful login, redirect
+    netlifyIdentity.on('login', function(user) {
+      netlifyIdentity.close();
+      window.location.href = 'index.html';
+    });
+
+    // Check on load
+    netlifyIdentity.init();
+  </script>
+</body>
+</html>

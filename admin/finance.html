@@ -1,0 +1,291 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/images/logo.png">
+    <title>Finance — Mediasoft Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="js/chart.js"></script>
+    <link rel="stylesheet" href="css/admin.css">
+<script src="js/auth.js"></script></head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/images/logo.png" alt="Mediasoft">
+                <span>Mediasoft</span>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav"></nav>
+            <div class="sidebar-footer" id="sidebarFooter"></div>
+        </aside>
+        <main class="main-content">
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                    <h2>Finance</h2>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-success" onclick="openModal('income')"><i class="fa-solid fa-plus"></i> Add Income</button>
+                    <button class="btn btn-danger" onclick="openModal('expense')"><i class="fa-solid fa-plus"></i> Add Expense</button>
+                </div>
+            </div>
+
+            <div class="stats-grid" id="financeStats"></div>
+
+            <div class="charts-grid" style="margin-bottom:24px;">
+                <div class="card">
+                    <div class="card-header"><h3>Income vs Expenses</h3></div>
+                    <div class="chart-container" id="financeChartContainer"><canvas id="financeChart-canvas"></canvas></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3>Monthly Profit</h3></div>
+                    <div class="chart-container" id="financeProfitChartContainer"><canvas id="financeProfitChart-canvas"></canvas></div>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+                <button class="btn btn-sm btn-primary" id="filterAll" onclick="setFilter('all')">All</button>
+                <button class="btn btn-sm btn-success" id="filterIncome" onclick="setFilter('income')">Income</button>
+                <button class="btn btn-sm btn-danger" id="filterExpense" onclick="setFilter('expense')">Expense</button>
+            </div>
+
+            <div class="card">
+                <div class="table-wrap">
+                    <table><thead><tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th style="text-align:right">Amount</th>
+                        <th style="width:100px">Actions</th>
+                    </tr></thead>
+                    <tbody id="financeTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal" style="max-width:500px;">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Transaction</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <input type="hidden" id="fType">
+                <div class="form-group"><label>Description</label><input class="form-control" id="fDesc" required></div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group"><label>Category</label>
+                        <select class="form-control" id="fCategory">
+                            <option value="Web Development">Web Development</option>
+                            <option value="Mobile App">Mobile App</option>
+                            <option value="Branding">Branding</option>
+                            <option value="Digital Marketing">Digital Marketing</option>
+                            <option value="ERP">ERP</option>
+                            <option value="Subscriptions">Subscriptions</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Salaries">Salaries</option>
+                            <option value="Tools">Tools</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Amount (MAD)</label><input class="form-control" id="fAmount" type="number" required></div>
+                </div>
+                <div class="form-group"><label>Date</label><input class="form-control" id="fDate" type="date"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveTransaction()"><i class="fa-solid fa-check"></i> Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js?2"></script>
+    <script src="js/db.js?2"></script>
+    <script>
+        initLayout('finance');
+        let filterType = 'all';
+
+        async function init() {
+            await DB.init();
+            try { render(); } catch(e) { console.error(e); }
+            try { renderTable(); } catch(e) { console.error(e); }
+            try { setFilter('all'); } catch(e) { console.error(e); }
+        }
+
+        function getFinance() {
+            const finance = DB.get('finance');
+            return finance.transactions || [];
+        }
+
+        function render() {
+            const transactions = getFinance();
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+            const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+            const netProfit = totalIncome - totalExpenses;
+
+            document.getElementById('financeStats').innerHTML = `
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:var(--success);"><i class="fa-solid fa-arrow-down"></i></div><div class="stat-info"><h4>Total Income</h4><div class="value">${totalIncome.toLocaleString()} MAD</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(239,68,68,0.15);color:var(--danger);"><i class="fa-solid fa-arrow-up"></i></div><div class="stat-info"><h4>Total Expenses</h4><div class="value">${totalExpenses.toLocaleString()} MAD</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:var(--success);"><i class="fa-solid fa-coins"></i></div><div class="stat-info"><h4>Net Profit</h4><div class="value">${netProfit.toLocaleString()} MAD</div></div></div>
+            `;
+
+            // Charts
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const monthData = {};
+            transactions.forEach(t => {
+                const m = t.date.substring(0, 7);
+                if (!monthData[m]) monthData[m] = { income: 0, expense: 0 };
+                if (t.type === 'income') monthData[m].income += t.amount;
+                else monthData[m].expense += t.amount;
+            });
+            const labels = Object.keys(monthData).sort();
+            const incomeData = labels.map(m => monthData[m].income);
+            const expenseData = labels.map(m => monthData[m].expense);
+            const profitData = labels.map(m => monthData[m].income - monthData[m].expense);
+
+            if (window.financeChart) window.financeChart.destroy();
+            if (window.financeProfitChart) window.financeProfitChart.destroy();
+
+            if (labels.length) {
+                document.querySelectorAll('.charts-grid .card .chart-container').forEach(c => { c.style.display = 'block'; });
+                document.getElementById('financeChartContainer').innerHTML = '<canvas id="financeChart-canvas"></canvas>';
+                document.getElementById('financeProfitChartContainer').innerHTML = '<canvas id="financeProfitChart-canvas"></canvas>';
+                document.querySelectorAll('.charts-grid .card .chart-empty').forEach(c => c.remove());
+                window.financeChart = new Chart(document.getElementById('financeChart-canvas'), {
+                    type: 'bar',
+                    data: { labels, datasets: [
+                        { label: 'Income', data: incomeData, backgroundColor: 'rgba(16,185,129,0.6)', borderColor: '#10b981', borderWidth: 1 },
+                        { label: 'Expenses', data: expenseData, backgroundColor: 'rgba(239,68,68,0.6)', borderColor: '#ef4444', borderWidth: 1 }
+                    ]},
+                    options: { responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: '#94a3b8' } } },
+                        scales: { x: { ticks: { color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } }
+                    }
+                });
+
+                window.financeProfitChart = new Chart(document.getElementById('financeProfitChart-canvas'), {
+                    type: 'line',
+                    data: { labels, datasets: [
+                        { label: 'Profit', data: profitData, borderColor: '#0396FA', backgroundColor: 'rgba(3,150,250,0.1)', fill: true, tension: 0.4, borderWidth: 2 }
+                    ]},
+                    options: { responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: '#94a3b8' } } },
+                        scales: { x: { ticks: { color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } }
+                    }
+                });
+            } else {
+                document.querySelectorAll('.charts-grid .card .chart-container').forEach(c => { c.style.display = 'none'; });
+                document.querySelectorAll('.charts-grid .card .chart-empty').forEach(c => c.remove());
+                document.querySelectorAll('.charts-grid .card').forEach(c => {
+                    const msg = document.createElement('div');
+                    msg.className = 'chart-empty';
+                    msg.style.cssText = 'padding:32px;text-align:center;color:var(--text-muted);';
+                    msg.innerHTML = '<i class="fa-solid fa-chart-simple" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.3;"></i>Add transactions to see charts';
+                    c.appendChild(msg);
+                });
+            }
+
+            renderTable();
+        }
+
+        function renderTable() {
+            let transactions = getFinance();
+            if (filterType !== 'all') transactions = transactions.filter(t => t.type === filterType);
+            transactions.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            document.getElementById('financeTable').innerHTML = transactions.length
+                ? transactions.map(t => `
+                    <tr>
+                        <td style="font-size:0.85rem;color:var(--text-muted);">${t.date}</td>
+                        <td>${t.type === 'income' ? '<span class="badge badge-success">Income</span>' : '<span class="badge badge-danger">Expense</span>'}</td>
+                        <td>${t.category || '-'}</td>
+                        <td>${t.description}</td>
+                        <td style="text-align:right;font-weight:600;color:${t.type === 'income' ? 'var(--success)' : 'var(--danger)'};">${t.type === 'income' ? '+' : '-'}${t.amount.toLocaleString()} MAD</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="editTransaction(${t.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteTransaction(${t.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('')
+                : '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">No transactions</td></tr>';
+        }
+
+        function setFilter(type) {
+            filterType = type;
+            ['all','income','expense'].forEach(t => {
+                const btn = document.getElementById('filter' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (btn) btn.className = 'btn btn-sm ' + (t === type ? (t === 'income' ? 'btn-success' : t === 'expense' ? 'btn-danger' : 'btn-primary') : 'btn-secondary');
+            });
+            renderTable();
+        }
+
+        function openModal(type) {
+            document.getElementById('editId').value = '';
+            document.getElementById('fType').value = type;
+            document.getElementById('fDesc').value = '';
+            document.getElementById('fCategory').value = type === 'income' ? 'Web Development' : 'Marketing';
+            document.getElementById('fAmount').value = '';
+            document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('modalTitle').textContent = type === 'income' ? 'Add Income' : 'Add Expense';
+            document.getElementById('modal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('open');
+        }
+
+        function saveTransaction() {
+            const id = document.getElementById('editId').value;
+            const data = {
+                type: document.getElementById('fType').value,
+                category: document.getElementById('fCategory').value,
+                description: document.getElementById('fDesc').value.trim(),
+                amount: parseFloat(document.getElementById('fAmount').value) || 0,
+                date: document.getElementById('fDate').value
+            };
+            if (!data.description || !data.amount) { DB.toast('Description and amount required', 'error'); return; }
+            const finance = DB.get('finance');
+            if (id) {
+                const idx = finance.transactions.findIndex(t => t.id === parseInt(id));
+                if (idx !== -1) finance.transactions[idx] = { ...finance.transactions[idx], ...data };
+                DB.toast('Transaction updated');
+            } else {
+                data.id = Date.now() + Math.floor(Math.random() * 1000);
+                finance.transactions.push(data);
+                DB.toast('Transaction added');
+            }
+            DB.set('finance', finance);
+            closeModal();
+            render();
+        }
+
+        function editTransaction(id) {
+            const finance = DB.get('finance');
+            const t = finance.transactions.find(t => t.id === id);
+            if (!t) return;
+            document.getElementById('editId').value = t.id;
+            document.getElementById('fType').value = t.type;
+            document.getElementById('fDesc').value = t.description;
+            document.getElementById('fCategory').value = t.category || 'Other';
+            document.getElementById('fAmount').value = t.amount;
+            document.getElementById('fDate').value = t.date;
+            document.getElementById('modalTitle').textContent = 'Edit ' + (t.type === 'income' ? 'Income' : 'Expense');
+            document.getElementById('modal').classList.add('open');
+        }
+
+        function deleteTransaction(id) {
+            if (!confirm('Delete this transaction?')) return;
+            DB.delete('finance', id);
+            DB.toast('Transaction deleted');
+            render();
+        }
+
+        init();
+    </script>
+</body>
+</html>
+

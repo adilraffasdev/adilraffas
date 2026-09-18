@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/images/logo.png">
+    <title>Add-ons — Mediasoft Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+<script src="js/auth.js"></script></head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/images/logo.png" alt="Mediasoft">
+                <span>Mediasoft</span>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav"></nav>
+            <div class="sidebar-footer" id="sidebarFooter"></div>
+        </aside>
+        <main class="main-content">
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                    <h2>Add-on Services</h2>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" onclick="openModal()"><i class="fa-solid fa-plus"></i> Add Add-on</button>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search add-ons..." oninput="renderTable()">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-wrap">
+                    <table><thead><tr>
+                        <th style="width:30px"></th>
+                        <th>Title</th>
+                        <th>Price</th>
+                        <th>Period</th>
+                        <th style="width:70px">Status</th>
+                        <th style="width:160px">Actions</th>
+                    </tr></thead>
+                    <tbody id="addonsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal" style="max-width:500px;">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Add-on</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="form-row" style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;">
+                    <div class="form-group"><label>Title</label><input class="form-control" id="fTitle" required></div>
+                    <div class="form-group"><label>Price</label><input class="form-control" id="fPrice" type="number" required></div>
+                    <div class="form-group"><label>Currency</label><input class="form-control" id="fCurrency" value="MAD"></div>
+                </div>
+                <div class="form-group"><label>Period (e.g. /mo, /year, or leave empty)</label><input class="form-control" id="fPeriod" placeholder="/mo"></div>
+                <div class="form-group"><label>Description</label><input class="form-control" id="fDesc" placeholder="Short description"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveAddon()"><i class="fa-solid fa-check"></i> Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js?2"></script>
+    <script src="js/db.js?2"></script>
+    <script>
+        initLayout('addons');
+
+        async function init() {
+            await DB.init();
+            renderTable();
+        }
+
+        function getData() {
+            let data = DB.get('addons');
+            const q = (document.getElementById('searchInput').value || '').toLowerCase();
+            if (q) data = data.filter(a => a.title.toLowerCase().includes(q));
+            return data.sort((a,b) => (a.sortOrder || 999) - (b.sortOrder || 999));
+        }
+
+        function renderTable() {
+            const data = getData();
+            document.getElementById('addonsTable').innerHTML = data.map(a => `
+                <tr draggable="true" data-id="${a.id}">
+                    <td class="drag-handle"><i class="fa-solid fa-grip-vertical"></i></td>
+                    <td><strong>${a.title}</strong></td>
+                    <td>${a.price ? a.price.toLocaleString() + ' ' + (a.currency || 'MAD') : '-'}</td>
+                    <td>${a.period || '-'}</td>
+                    <td><label class="toggle"><input type="checkbox" ${a.status === 'visible' ? 'checked' : ''} onchange="toggleStatus(${a.id})"><span class="toggle-slider"></span></label></td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="editAddon(${a.id})"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-sm btn-info" onclick="duplicateAddon(${a.id})" style="background:rgba(3,150,250,0.15);color:var(--secondary);"><i class="fa-solid fa-copy"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteAddon(${a.id})"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openModal(data) {
+            document.getElementById('editId').value = data ? data.id : '';
+            document.getElementById('fTitle').value = data ? data.title : '';
+            document.getElementById('fPrice').value = data ? data.price : '';
+            document.getElementById('fCurrency').value = data ? data.currency : 'MAD';
+            document.getElementById('fPeriod').value = data ? data.period : '';
+            document.getElementById('fDesc').value = data ? data.description : '';
+            document.getElementById('modalTitle').textContent = data ? 'Edit Add-on' : 'Add Add-on';
+            document.getElementById('modal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('open');
+            document.getElementById('editId').value = '';
+        }
+
+        function saveAddon() {
+            const id = document.getElementById('editId').value;
+            const data = {
+                title: document.getElementById('fTitle').value.trim(),
+                price: parseFloat(document.getElementById('fPrice').value) || 0,
+                currency: document.getElementById('fCurrency').value.trim() || 'MAD',
+                period: document.getElementById('fPeriod').value.trim(),
+                description: document.getElementById('fDesc').value.trim(),
+                status: 'visible'
+            };
+            if (!data.title) { DB.toast('Title is required', 'error'); return; }
+            if (id) {
+                DB.update('addons', parseInt(id), data);
+                DB.toast('Add-on updated');
+            } else {
+                DB.add('addons', data);
+                DB.toast('Add-on added');
+            }
+            closeModal();
+            renderTable();
+        }
+
+        function editAddon(id) {
+            const a = DB.getById('addons', id);
+            if (a) openModal(a);
+        }
+
+        function duplicateAddon(id) {
+            const a = DB.getById('addons', id);
+            if (!a) return;
+            const copy = { ...a };
+            delete copy.id;
+            copy.title = a.title + ' (copy)';
+            DB.add('addons', copy);
+            DB.toast('Add-on duplicated');
+            renderTable();
+        }
+
+        function deleteAddon(id) {
+            if (!confirm('Delete this add-on?')) return;
+            DB.delete('addons', id);
+            DB.toast('Add-on deleted');
+            renderTable();
+        }
+
+        function toggleStatus(id) {
+            const a = DB.getById('addons', id);
+            if (a) {
+                DB.update('addons', id, { status: a.status === 'visible' ? 'hidden' : 'visible' });
+                DB.toast(a.status === 'visible' ? 'Add-on hidden' : 'Add-on visible');
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
+

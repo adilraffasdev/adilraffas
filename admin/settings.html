@@ -1,0 +1,194 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/images/logo.png">
+    <title>Settings — Mediasoft Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/images/logo.png" alt="Mediasoft">
+                <span>Mediasoft</span>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav"></nav>
+            <div class="sidebar-footer" id="sidebarFooter"></div>
+        </aside>
+        <main class="main-content">
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                    <h2>Settings</h2>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" onclick="saveSettings()"><i class="fa-solid fa-check"></i> Save Settings</button>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div class="card">
+                    <div class="card-header"><h3>Company Info</h3></div>
+                    <div class="form-group"><label>Company Name</label><input class="form-control" id="fCompanyName"></div>
+                    <div class="form-group"><label>Logo Path</label><input class="form-control" id="fLogo" placeholder="assets/images/logo.png"></div>
+                    <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="form-group"><label>Email</label><input class="form-control" id="fEmail" type="email"></div>
+                        <div class="form-group"><label>Phone</label><input class="form-control" id="fPhone"></div>
+                    </div>
+                    <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="form-group"><label>WhatsApp</label><input class="form-control" id="fWhatsapp" placeholder="212708060819"></div>
+                        <div class="form-group"><label>Address</label><input class="form-control" id="fAddress"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3>Social Links</h3></div>
+                    <div class="form-group"><label>Facebook</label><input class="form-control" id="fFacebook" placeholder="https://facebook.com/..."></div>
+                    <div class="form-group"><label>Instagram</label><input class="form-control" id="fInstagram" placeholder="https://instagram.com/..."></div>
+                    <div class="form-group"><label>GitHub</label><input class="form-control" id="fGithub" placeholder="https://github.com/..."></div>
+                    <div style="margin-top:24px;">
+                        <div class="card-header"><h3>SEO</h3></div>
+                        <div class="form-group"><label>Default Title</label><input class="form-control" id="fSeoTitle"></div>
+                        <div class="form-group"><label>Default Description</label><textarea class="form-control" id="fSeoDesc" rows="2"></textarea></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:16px;">
+                <div class="card-header"><h3>Change Password</h3></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                    <div class="form-group"><label>Current Password</label><input class="form-control" id="fCurPass" type="password"></div>
+                    <div class="form-group"><label>New Password</label><input class="form-control" id="fNewPass" type="password"></div>
+                    <div class="form-group"><label>Confirm New Password</label><input class="form-control" id="fConfirmPass" type="password"></div>
+                </div>
+                <button class="btn btn-primary" onclick="changePassword()" style="margin-top:8px;"><i class="fa-solid fa-key"></i> Update Password</button>
+            </div>
+
+            <div class="card" style="margin-top:16px;">
+                <div class="card-header"><h3>Data Management</h3></div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <button class="btn btn-secondary" onclick="exportData()"><i class="fa-solid fa-download"></i> Export All Data</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()"><i class="fa-solid fa-upload"></i> Import Data</button>
+                    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+                    <button class="btn btn-danger" onclick="resetData()"><i class="fa-solid fa-rotate-left"></i> Reset to Default</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/layout.js?2"></script>
+    <script src="js/db.js?2"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        initLayout('settings');
+
+        async function init() {
+            await DB.init();
+            loadSettings();
+        }
+
+        function loadSettings() {
+            const s = DB.get('settings');
+            document.getElementById('fCompanyName').value = s.companyName || '';
+            document.getElementById('fLogo').value = s.logo || '';
+            document.getElementById('fEmail').value = s.email || '';
+            document.getElementById('fPhone').value = s.phone || '';
+            document.getElementById('fWhatsapp').value = s.whatsapp || '';
+            document.getElementById('fAddress').value = s.address || '';
+            document.getElementById('fFacebook').value = (s.social && s.social.facebook) || '';
+            document.getElementById('fInstagram').value = (s.social && s.social.instagram) || '';
+            document.getElementById('fGithub').value = (s.social && s.social.github) || '';
+            document.getElementById('fSeoTitle').value = (s.seo && s.seo.title) || '';
+            document.getElementById('fSeoDesc').value = (s.seo && s.seo.description) || '';
+        }
+
+        function saveSettings() {
+            const data = {
+                companyName: document.getElementById('fCompanyName').value.trim(),
+                logo: document.getElementById('fLogo').value.trim(),
+                email: document.getElementById('fEmail').value.trim(),
+                phone: document.getElementById('fPhone').value.trim(),
+                whatsapp: document.getElementById('fWhatsapp').value.trim(),
+                address: document.getElementById('fAddress').value.trim(),
+                social: {
+                    facebook: document.getElementById('fFacebook').value.trim(),
+                    instagram: document.getElementById('fInstagram').value.trim(),
+                    github: document.getElementById('fGithub').value.trim()
+                },
+                seo: {
+                    title: document.getElementById('fSeoTitle').value.trim(),
+                    description: document.getElementById('fSeoDesc').value.trim()
+                }
+            };
+            DB.set('settings', data);
+            DB.toast('Settings saved');
+        }
+
+        function changePassword() {
+            const cur = document.getElementById('fCurPass').value;
+            const newPass = document.getElementById('fNewPass').value;
+            const confirmPass = document.getElementById('fConfirmPass').value;
+            if (!cur || !newPass || !confirmPass) { DB.toast('Fill all fields', 'error'); return; }
+            if (newPass !== confirmPass) { DB.toast('New passwords do not match', 'error'); return; }
+            if (cur !== AUTH_CONFIG.password) { DB.toast('Current password is wrong', 'error'); return; }
+            if (newPass.length < 6) { DB.toast('Password must be at least 6 characters', 'error'); return; }
+            localStorage.setItem('mediasoft_auth', JSON.stringify({ username: AUTH_CONFIG.username, password: newPass }));
+            document.getElementById('fCurPass').value = '';
+            document.getElementById('fNewPass').value = '';
+            document.getElementById('fConfirmPass').value = '';
+            DB.toast('Password updated successfully');
+        }
+
+        function exportData() {
+            const stores = ['services', 'packages', 'projects', 'blogs', 'finance', 'settings'];
+            const exportObj = {};
+            stores.forEach(s => exportObj[s] = DB.get(s));
+            const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mediasoft-backup-' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            DB.toast('Data exported');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+            const stores = ['services', 'packages', 'projects', 'blogs', 'testimonials', 'clients', 'finance', 'settings'];
+                    stores.forEach(s => { if (data[s]) DB.set(s, data[s]); });
+                    DB.toast('Data imported successfully');
+                    loadSettings();
+                } catch { DB.toast('Invalid JSON file', 'error'); }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function resetData() {
+            if (!confirm('Reset all data to default? This cannot be undone.')) return;
+            if (!confirm('Are you sure?')) return;
+            localStorage.removeItem('mediasoft_services');
+            localStorage.removeItem('mediasoft_packages');
+            localStorage.removeItem('mediasoft_projects');
+            localStorage.removeItem('mediasoft_blogs');
+            localStorage.removeItem('mediasoft_testimonials');
+            localStorage.removeItem('mediasoft_clients');
+            localStorage.removeItem('mediasoft_finance');
+            localStorage.removeItem('mediasoft_settings');
+            DB.init().then(() => { loadSettings(); DB.toast('Data reset to default'); });
+        }
+
+        init();
+    </script>
+</body>
+</html>
+

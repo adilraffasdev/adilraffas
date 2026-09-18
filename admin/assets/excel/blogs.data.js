@@ -1,0 +1,50 @@
+var BLOGS_DEFAULT = [
+  {
+    "id": 1,
+    "title": "Comment choisir la bonne technologie pour votre projet web",
+    "slug": "choisir-technologie-projet-web",
+    "category": "Web Development",
+    "tags": ["React", "Next.js", "conseils"],
+    "featuredImage": "",
+    "content": "<p>Choisir la bonne technologie pour votre projet web est crucial pour sa réussite. Dans cet article, nous explorons les critères essentiels à considérer.</p><h2>Performance</h2><p>La vitesse de chargement impacte directement l'expérience utilisateur et le référencement. Next.js offre un excellent équilibre entre performance et flexibilité.</p><h2>Évolutivité</h2><p>Votre solution doit pouvoir grandir avec votre entreprise. Les frameworks modernes comme React et Vue.js sont conçus pour des applications évolutives.</p><h2>Maintenance</h2><p>Optez pour des technologies avec une communauté active et un bon support à long terme.</p>",
+    "excerpt": "Découvrez les critères essentiels pour sélectionner la stack technique idéale pour votre projet web.",
+    "author": "Mediasoft",
+    "publishDate": "2025-09-15",
+    "readingTime": "5 min",
+    "seoTitle": "",
+    "seoDescription": "",
+    "status": "published"
+  },
+  {
+    "id": 2,
+    "title": "L'importance du branding pour les PME marocaines",
+    "slug": "importance-branding-pme-maroc",
+    "category": "Branding",
+    "tags": ["branding", "PME", "Maroc"],
+    "featuredImage": "",
+    "content": "<p>Le branding n'est pas réservé aux grandes entreprises. Les PME marocaines ont tout à gagner à investir dans une identité de marque forte.</p><h2>Crédibilité</h2><p>Une identité visuelle professionnelle inspire confiance et crédibilité auprès de vos clients.</p><h2>Reconnaissance</h2><p>Un branding cohérent rend votre entreprise mémorable et facilite la reconnaissance par vos clients.</p><h2>Différenciation</h2><p>Dans un marché concurrentiel, une marque forte vous distingue de vos concurrents.</p>",
+    "excerpt": "Pourquoi le branding est un investissement stratégique pour les petites et moyennes entreprises au Maroc.",
+    "author": "Mediasoft",
+    "publishDate": "2025-08-20",
+    "readingTime": "4 min",
+    "seoTitle": "",
+    "seoDescription": "",
+    "status": "published"
+  },
+  {
+    "id": 3,
+    "title": "Guide complet du SEO pour les sites e-commerce",
+    "slug": "guide-seo-ecommerce",
+    "category": "Digital Marketing",
+    "tags": ["SEO", "e-commerce", "marketing"],
+    "featuredImage": "",
+    "content": "<p>Le SEO est essentiel pour générer du trafic organique vers votre boutique en ligne. Voici un guide complet pour optimiser votre site e-commerce.</p><h2>Recherche de mots-clés</h2><p>Identifiez les termes que vos clients potentiels utilisent pour trouver vos produits.</p><h2>Optimisation des fiches produits</h2><p>Chaque fiche produit doit avoir un titre unique, une description détaillée et des images optimisées.</p><h2>Vitesse du site</h2><p>La vitesse de chargement est un facteur de classement crucial pour Google.</p>",
+    "excerpt": "Tout ce que vous devez savoir pour optimiser votre boutique en ligne et grimper dans les résultats de recherche.",
+    "author": "Mediasoft",
+    "publishDate": "2025-10-01",
+    "readingTime": "7 min",
+    "seoTitle": "",
+    "seoDescription": "",
+    "status": "published"
+  }
+];

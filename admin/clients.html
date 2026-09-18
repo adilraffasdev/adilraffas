@@ -1,0 +1,513 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/images/logo.png">
+    <title>Clients — Mediasoft Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .src-doctors { color: var(--secondary); }
+        .src-cars { color: #10B981; }
+        .badge-src { font-size: 11px; padding: 2px 10px; border-radius: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-src.doctors { background: rgba(3,150,250,0.12); color: var(--secondary); }
+        .badge-src.cars { background: rgba(16,185,129,0.12); color: var(--success); }
+        .badge-cabinet { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; background: rgba(139,92,246,0.14); color: #8B5CF6; }
+        .badge-website { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+        .badge-website.yes { background: rgba(16,185,129,0.15); color: var(--success); }
+        .badge-website.no { background: rgba(239,68,68,0.1); color: var(--text-muted); }
+        .badge-city { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; background: rgba(139,92,246,0.12); color: #8B5CF6; display:inline-block; }
+        .call-badge { font-size: 11px; padding: 2px 10px; border-radius: 10px; font-weight: 600; display: inline-block; }
+        .call-badge.not_called { background: rgba(100,100,100,0.15); color: var(--text-muted); }
+        .call-badge.called { background: rgba(16,185,129,0.15); color: var(--success); }
+        .call-badge.no_answer { background: rgba(245,158,11,0.12); color: var(--warning); }
+        .call-badge.wrong_number { background: rgba(239,68,68,0.12); color: var(--danger); }
+        .call-badge.busy { background: rgba(3,150,250,0.12); color: var(--secondary); }
+        .dec-badge { font-size: 11px; padding: 2px 10px; border-radius: 10px; font-weight: 600; display: inline-block; }
+        .dec-badge.pending { background: rgba(100,100,100,0.15); color: var(--text-muted); }
+        .dec-badge.interested { background: rgba(16,185,129,0.15); color: var(--success); }
+        .dec-badge.not_interested { background: rgba(239,68,68,0.12); color: var(--danger); }
+        .dec-badge.follow_up { background: rgba(245,158,11,0.12); color: var(--warning); }
+        .dec-badge.converted { background: rgba(139,92,246,0.15); color: #8B5CF6; }
+        .actions-cell { display: flex; gap: 4px; }
+        .notes-preview { max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--text-muted); font-size: 0.83rem; transition: color 0.15s; }
+        .notes-preview:hover { color: var(--text); }
+        .notes-preview.has-notes { color: var(--text-soft); }
+        .table th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 10px 12px !important; }
+        .table td { vertical-align: middle; padding: 10px 12px !important; }
+        .client-row:hover td { background: rgba(3,150,250,0.03); }
+        .inline-sel { padding: 5px 8px; border-radius: 6px; border: 1px solid var(--border-strong); background: var(--bg-card); color: var(--text); font-size: 0.82rem; cursor: pointer; }
+        .inline-sel:focus { outline: none; border-color: var(--primary); }
+        .phone-link { color: var(--secondary); text-decoration: none; font-weight: 500; font-size: 0.9rem; }
+        .phone-link:hover { text-decoration: underline; }
+        .stat-icon-sm { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+        .result-count { font-size: 0.85rem; color: var(--text-muted); padding: 4px 0 8px; }
+        .result-count strong { color: var(--text); }
+        .filter-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 14px 18px; background: var(--bg-card); border-bottom: 1px solid var(--border-weak); }
+        .filter-row .src-pills { display: flex; gap: 4px; }
+        .filter-row .src-pills .pill { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-strong); background: transparent; color: var(--text-muted); font-size: 0.82rem; cursor: pointer; font-weight: 500; transition: all 0.15s; }
+        .filter-row .src-pills .pill:hover { border-color: var(--primary); color: var(--text); }
+        .filter-row .src-pills .pill.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .filter-row .src-pills .pill i { margin-right: 5px; }
+        .filter-row .f-group { display: flex; align-items: center; gap: 6px; }
+        .filter-row .f-group label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; white-space: nowrap; }
+        .filter-row .f-group select { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-strong); background: var(--bg-card); color: var(--text); font-size: 0.82rem; cursor: pointer; }
+        .filter-row .f-group select:focus { outline: none; border-color: var(--primary); }
+        @media (max-width: 768px) { .filter-row { flex-direction: column; align-items: stretch; } }
+    </style>
+<script src="js/auth.js"></script></head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand"><img src="assets/images/logo.png" alt="Mediasoft"><span>Mediasoft</span></div>
+            <nav class="sidebar-nav" id="sidebarNav"></nav>
+            <div class="sidebar-footer" id="sidebarFooter"></div>
+        </aside>
+        <main class="main-content">
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                    <h2><i class="fa-solid fa-address-book" style="color:var(--secondary);margin-right:8px;"></i>Clients</h2>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-secondary" onclick="importClients()" title="Re-import all clients from spreadsheet"><i class="fa-solid fa-rotate"></i> Reset Data</button>
+                    <button class="btn btn-primary" onclick="exportClients()"><i class="fa-solid fa-download"></i> Export CSV</button>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;" id="clientsStats"></div>
+
+            <div class="card" style="padding:0;">
+                <div class="filter-row">
+                    <div style="position:relative;flex:1;min-width:180px;">
+                        <i class="fa-solid fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.85rem;"></i>
+                        <input type="text" id="searchInput" placeholder="Search name, phone, category..." oninput="renderTable()" style="width:100%;padding:8px 12px 8px 34px;border-radius:8px;border:1px solid var(--border-strong);background:var(--bg);color:var(--text);font-size:0.85rem;box-sizing:border-box;">
+                    </div>
+                    <div class="f-group">
+                        <label>Source:</label>
+                        <div class="src-pills" id="sourceFilter">
+                            <button class="pill" data-src="" onclick="setSource(this)">All</button>
+                            <button class="pill active" data-src="doctors" onclick="setSource(this)"><i class="fa-solid fa-stethoscope"></i>Doctors</button>
+                            <button class="pill" data-src="location de voiture" onclick="setSource(this)"><i class="fa-solid fa-car"></i>Car Rental</button>
+                        </div>
+                    </div>
+                    <div class="f-group">
+                        <label>City:</label>
+                        <select id="filterCity" onchange="renderTable()">
+                            <option value="">All Cities</option>
+                            <option value="Tanger">Tanger</option>
+                            <option value="Rabat">Rabat</option>
+                            <option value="Casablanca">Casablanca</option>
+                            <option value="Marrakech">Marrakech</option>
+                            <option value="Agadir">Agadir</option>
+                        </select>
+                    </div>
+                    <div class="f-group">
+                        <label>Website:</label>
+                        <select id="filterWebsite" onchange="renderTable()">
+                            <option value="">All</option>
+                            <option value="yes">Has Website</option>
+                            <option value="no">No Website</option>
+                        </select>
+                    </div>
+                    <div class="f-group">
+                        <label>Status:</label>
+                        <select id="filterCall" onchange="renderTable()">
+                            <option value="">All Calls</option>
+                            <option value="not_called">Not Called</option>
+                            <option value="called">Called</option>
+                            <option value="no_answer">No Answer</option>
+                            <option value="wrong_number">Wrong #</option>
+                            <option value="busy">Busy</option>
+                        </select>
+                    </div>
+                    <div class="f-group">
+                        <label>Decision:</label>
+                        <select id="filterDecision" onchange="renderTable()">
+                            <option value="">All Decisions</option>
+                            <option value="pending">Pending</option>
+                            <option value="interested">Interested</option>
+                            <option value="not_interested">Not Interested</option>
+                            <option value="follow_up">Follow Up</option>
+                            <option value="converted">Converted</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table class="table" style="margin:0;">
+                        <thead>
+                            <tr>
+                                <th style="width:32px;">#</th>
+                                <th>Client</th>
+                                <th style="width:100px;">Source</th>
+                                <th style="width:80px;">City</th>
+                                <th style="width:90px;">Website</th>
+                                <th style="width:220px;">Details</th>
+                                <th style="width:120px;">Call Status</th>
+                                <th style="width:120px;">Decision</th>
+                                <th>Notes</th>
+                                <th style="width:90px;">Last Call</th>
+                                <th style="width:60px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientsTable"></tbody>
+                    </table>
+                </div>
+                <div class="result-count" id="clientsCount" style="padding:8px 16px;border-top:1px solid var(--border-weak);margin:0;"></div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="notesModal">
+        <div class="modal" style="max-width:480px;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-pen"></i> Call Notes</h3>
+                <button class="btn btn-sm btn-secondary" onclick="closeNotesModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:10px 14px;background:var(--bg-card);border-radius:8px;">
+                    <div id="notesAvatar" style="width:36px;height:36px;border-radius:50%;background:var(--grad-primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.85rem;"></div>
+                    <div><div id="notesClientName" style="font-weight:600;"></div><div id="notesClientInfo" style="font-size:0.8rem;color:var(--text-muted);"></div></div>
+                </div>
+                <label style="font-size:0.85rem;font-weight:500;color:var(--text-muted);display:block;margin-bottom:6px;">Notes</label>
+                <textarea class="form-control" id="notesText" rows="5" placeholder="Call notes, follow-up details..."></textarea>
+                <div style="display:flex;gap:8px;margin-top:10px;">
+                    <div style="flex:1;">
+                        <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px;">Call Status</label>
+                        <select class="form-control" id="notesCallStatus"></select>
+                    </div>
+                    <div style="flex:1;">
+                        <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px;">Decision</label>
+                        <select class="form-control" id="notesDecision"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeNotesModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveNotes()"><i class="fa-solid fa-check"></i> Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js?2"></script>
+    <script src="js/db.js?2"></script>
+    <script src="assets/excel/clients.data.js"></script>
+    <script>
+        initLayout('clients');
+        let editingNotesId = null;
+        let sourceFilter = 'doctors';
+
+        function normalizeClients(arr) {
+            return arr.map((c, i) => ({
+                ...c,
+                id: c.id ?? i + 1,
+                leadType: c.leadType || '',
+                cabinetConfidence: c.cabinetConfidence || '',
+                cabinetReason: c.cabinetReason || '',
+                sourceUrl: c.sourceUrl || '',
+                callStatus: c.callStatus || 'not_called',
+                decision: c.decision || 'pending',
+                notes: c.notes || '',
+                lastCalled: c.lastCalled || '',
+            }));
+        }
+
+        async function init() {
+            await DB.init();
+            const clients = DB.get('clients');
+            const isStale = !clients || clients.length < CLIENTS_DEFAULT.length;
+            if (isStale && typeof CLIENTS_DEFAULT !== 'undefined' && CLIENTS_DEFAULT.length) {
+                saveClients(mergeDefaultClients(clients || [], normalizeClients(CLIENTS_DEFAULT)));
+            } else if (clients && clients.length && !clients[0].callStatus) {
+                saveClients(normalizeClients(clients));
+            }
+            render();
+        }
+
+        function getClients() { return DB.get('clients') || []; }
+        function saveClients(arr) { DB.set('clients', arr); }
+
+        function phoneKeys(phone) {
+            const raw = String(phone || '');
+            const matches = raw.match(/(?:\+?212|0)\s?[5-7](?:[\s.-]?\d{2}){4}/g) || [raw];
+            return matches.map(p => p.replace(/\D/g, '')).map(d => d.startsWith('212') && d.length === 12 ? '0' + d.slice(3) : d).filter(d => d.length >= 9);
+        }
+
+        function mergeDefaultClients(current, defaults) {
+            const byPhone = new Map();
+            const merged = normalizeClients(current);
+            merged.forEach(c => phoneKeys(c.phone).forEach(p => byPhone.set(p, c)));
+
+            defaults.forEach(def => {
+                const keys = phoneKeys(def.phone);
+                const existing = keys.map(k => byPhone.get(k)).find(Boolean);
+                if (existing) {
+                    Object.assign(existing, {
+                        ...def,
+                        id: existing.id,
+                        callStatus: existing.callStatus || def.callStatus || 'not_called',
+                        decision: existing.decision || def.decision || 'pending',
+                        notes: existing.notes || def.notes || '',
+                        lastCalled: existing.lastCalled || def.lastCalled || '',
+                    });
+                    return;
+                }
+                merged.push(def);
+                keys.forEach(k => byPhone.set(k, def));
+            });
+
+            return normalizeClients(merged);
+        }
+
+        function importClients() {
+            if (typeof CLIENTS_DEFAULT === 'undefined' || !CLIENTS_DEFAULT.length) {
+                DB.toast('Spreadsheet data not found', 'error');
+                return;
+            }
+            if (!confirm('Reset all client data from spreadsheet? This will overwrite your tracking data.')) return;
+            saveClients(normalizeClients(CLIENTS_DEFAULT));
+            render();
+            DB.toast('Reset to ' + CLIENTS_DEFAULT.length + ' clients');
+        }
+
+        function refreshCityOptions(clients) {
+            const select = document.getElementById('filterCity');
+            const selected = select.value;
+            const cities = [...new Set(clients.map(c => c.city).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+            select.innerHTML = '<option value="">All Cities</option>' + cities.map(city => '<option value="' + esc(city) + '">' + esc(city) + '</option>').join('');
+            select.value = cities.includes(selected) ? selected : '';
+        }
+
+        function setSource(btn) {
+            document.querySelectorAll('#sourceFilter .pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            sourceFilter = btn.dataset.src || '';
+            renderTable();
+        }
+
+        function render() {
+            renderTable();
+        }
+
+        function renderStats(clients) {
+            const total = clients.length;
+            const doctors = clients.filter(c => c.source === 'doctors').length;
+            const cars = clients.filter(c => c.source === 'location de voiture').length;
+            const cabinets = clients.filter(c => c.leadType === 'cabinet').length;
+            const called = clients.filter(c => c.callStatus !== 'not_called').length;
+            const interested = clients.filter(c => c.decision === 'interested' || c.decision === 'converted').length;
+            const withSite = clients.filter(c => c.website && c.website.trim()).length;
+            const notCalled = clients.filter(c => c.callStatus === 'not_called').length;
+
+            document.getElementById('clientsStats').innerHTML = `
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(3,150,250,0.1);color:var(--secondary);"><i class="fa-solid fa-users"></i></div><div class="stat-info"><h4>Filtered</h4><div class="value">${total}</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(3,150,250,0.1);color:var(--secondary);"><i class="fa-solid fa-stethoscope"></i></div><div class="stat-info"><h4>Doctors</h4><div class="value">${doctors}</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(139,92,246,0.1);color:#8B5CF6;"><i class="fa-solid fa-house-medical"></i></div><div class="stat-info"><h4>Cabinets</h4><div class="value">${cabinets}</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.1);color:var(--success);"><i class="fa-solid fa-car"></i></div><div class="stat-info"><h4>Car Rental</h4><div class="value">${cars}</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.1);color:var(--success);"><i class="fa-solid fa-globe"></i></div><div class="stat-info"><h4>With Website</h4><div class="value">${withSite}</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(139,92,246,0.1);color:#8B5CF6;"><i class="fa-solid fa-phone"></i></div><div class="stat-info"><h4>Called</h4><div class="value">${called}</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,0.1);color:var(--warning);"><i class="fa-solid fa-clock"></i></div><div class="stat-info"><h4>Not Called</h4><div class="value">${notCalled}</div></div></div>
+            `;
+        }
+
+        function renderTable() {
+            let clients = getClients();
+            const q = document.getElementById('searchInput').value.toLowerCase().trim();
+            refreshCityOptions(clients);
+
+            if (sourceFilter) clients = clients.filter(c => c.source === sourceFilter);
+            const cityFilter = document.getElementById('filterCity').value;
+            if (cityFilter) clients = clients.filter(c => c.city === cityFilter);
+            if (q) clients = clients.filter(c =>
+                (c.name || '').toLowerCase().includes(q) ||
+                (c.phone || '').includes(q) ||
+                (c.category || '').toLowerCase().includes(q) ||
+                (c.address || '').toLowerCase().includes(q) ||
+                (c.cabinetReason || '').toLowerCase().includes(q)
+            );
+
+            const ws = document.getElementById('filterWebsite').value;
+            if (ws === 'yes') clients = clients.filter(c => c.website && c.website.trim());
+            else if (ws === 'no') clients = clients.filter(c => !c.website || !c.website.trim());
+
+            const cf = document.getElementById('filterCall').value;
+            if (cf) clients = clients.filter(c => c.callStatus === cf);
+
+            const df = document.getElementById('filterDecision').value;
+            if (df) clients = clients.filter(c => c.decision === df);
+
+            renderStats(clients);
+            const allTotal = getClients().length;
+            document.getElementById('clientsCount').innerHTML = `Showing <strong>${clients.length}</strong> of <strong>${allTotal}</strong> clients`;
+
+            document.getElementById('clientsTable').innerHTML = clients.length
+                ? clients.map((c, i) => `
+                    <tr class="client-row">
+                        <td style="color:var(--text-muted);font-size:0.8rem;">${i + 1}</td>
+                        <td>
+                            <div style="display:flex;flex-direction:column;gap:2px;">
+                                <strong style="font-size:0.9rem;">${esc(c.name)}</strong>
+                                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                                    ${c.phone ? '<a href="tel:' + c.phone + '" class="phone-link"><i class="fa-solid fa-phone" style="font-size:0.7rem;"></i> ' + esc(c.phone) + '</a>' : ''}
+                                    ${c.rating ? '<span style="font-size:0.8rem;color:var(--text-muted);">&#11088; ' + esc(c.rating) + '</span>' : ''}
+                                    ${c.leadType === 'cabinet' ? '<span class="badge-cabinet" title="' + esc(c.cabinetReason || '') + '"><i class="fa-solid fa-house-medical"></i> Cabinet ' + esc(c.cabinetConfidence || '') + '</span>' : ''}
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge-src ${c.source === 'doctors' ? 'doctors' : 'cars'}"><i class="fa-solid ${c.source === 'doctors' ? 'fa-stethoscope' : 'fa-car'}"></i> ${c.source === 'doctors' ? 'Doctor' : 'Car Rental'}</span></td>
+                        <td><span class="badge-city">${esc(c.city || '-')}</span></td>
+                        <td>${c.website && c.website.trim() ? '<span class="badge-website yes"><i class="fa-solid fa-check"></i> Yes</span>' : '<span class="badge-website no"><i class="fa-solid fa-xmark"></i> No</span>'}</td>
+                        <td>
+                            <div style="max-width:260px;font-size:0.78rem;color:var(--text-muted);line-height:1.35;">
+                                ${c.category ? '<div style="color:var(--text-soft);font-weight:600;">' + esc(c.category) + '</div>' : ''}
+                                ${c.address ? '<div title="' + esc(c.address) + '">' + esc(c.address.substring(0, 90)) + (c.address.length > 90 ? '...' : '') + '</div>' : ''}
+                                ${c.sourceUrl ? '<a href="' + esc(c.sourceUrl) + '" target="_blank" rel="noopener" style="color:var(--secondary);text-decoration:none;">Source</a>' : ''}
+                            </div>
+                        </td>
+                        <td>
+                            <select class="inline-sel" onchange="updateCall(${c.id}, this.value)" ${c.callStatus === 'not_called' ? 'style="border-color:rgba(239,68,68,0.3);"' : ''}>
+                                <option value="not_called" ${c.callStatus === 'not_called' ? 'selected' : ''}>Not Called</option>
+                                <option value="called" ${c.callStatus === 'called' ? 'selected' : ''}>Called</option>
+                                <option value="no_answer" ${c.callStatus === 'no_answer' ? 'selected' : ''}>No Answer</option>
+                                <option value="wrong_number" ${c.callStatus === 'wrong_number' ? 'selected' : ''}>Wrong #</option>
+                                <option value="busy" ${c.callStatus === 'busy' ? 'selected' : ''}>Busy</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="inline-sel" onchange="updateDecision(${c.id}, this.value)">
+                                <option value="pending" ${c.decision === 'pending' ? 'selected' : ''}>Pending</option>
+                                <option value="interested" ${c.decision === 'interested' ? 'selected' : ''}>Interested</option>
+                                <option value="not_interested" ${c.decision === 'not_interested' ? 'selected' : ''}>Not Interested</option>
+                                <option value="follow_up" ${c.decision === 'follow_up' ? 'selected' : ''}>Follow Up</option>
+                                <option value="converted" ${c.decision === 'converted' ? 'selected' : ''}>Converted</option>
+                            </select>
+                        </td>
+                        <td>
+                            <span class="notes-preview ${c.notes ? 'has-notes' : ''}" onclick="openNotes(${c.id})" title="${esc(c.notes || '')}">
+                                ${c.notes ? '<i class="fa-solid fa-file-lines" style="margin-right:4px;color:var(--secondary);"></i>' + esc(c.notes.substring(0, 35)) + (c.notes.length > 35 ? '...' : '') : '<span style="font-style:italic;">Add notes</span>'}
+                            </span>
+                        </td>
+                        <td style="font-size:0.83rem;color:var(--text-muted);">${c.lastCalled || '-'}</td>
+                        <td><button class="btn btn-sm btn-danger" onclick="deleteClient(${c.id})" title="Delete"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `).join('')
+                : '<tr><td colspan="11" style="text-align:center;padding:48px 16px;color:var(--text-muted);"><i class="fa-solid fa-inbox" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.3;"></i>No clients match your filters</td></tr>';
+        }
+
+        function updateCall(id, val) {
+            const clients = getClients();
+            const c = clients.find(x => x.id === id);
+            if (!c) return;
+            c.callStatus = val;
+            if (val === 'called' && !c.lastCalled) c.lastCalled = new Date().toISOString().split('T')[0];
+            saveClients(clients);
+            render();
+        }
+
+        function updateDecision(id, val) {
+            const clients = getClients();
+            const c = clients.find(x => x.id === id);
+            if (!c) return;
+            c.decision = val;
+            saveClients(clients);
+            render();
+        }
+
+        function openNotes(id) {
+            editingNotesId = id;
+            const clients = getClients();
+            const c = clients.find(x => x.id === id);
+            if (!c) return;
+            document.getElementById('notesAvatar').textContent = (c.name || '??').substring(0, 2).toUpperCase();
+            document.getElementById('notesClientName').textContent = c.name || 'Unknown';
+            document.getElementById('notesClientInfo').textContent = (c.source === 'doctors' ? 'Doctor' : 'Car Rental') + (c.phone ? ' · ' + c.phone : '');
+            document.getElementById('notesText').value = c.notes || '';
+
+            const callSel = document.getElementById('notesCallStatus');
+            callSel.innerHTML = ['not_called','called','no_answer','wrong_number','busy'].map(v =>
+                '<option value="' + v + '" ' + (c.callStatus === v ? 'selected' : '') + '>' + v.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) + '</option>'
+            ).join('');
+
+            const decSel = document.getElementById('notesDecision');
+            decSel.innerHTML = ['pending','interested','not_interested','follow_up','converted'].map(v =>
+                '<option value="' + v + '" ' + (c.decision === v ? 'selected' : '') + '>' + v.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) + '</option>'
+            ).join('');
+
+            document.getElementById('notesModal').classList.add('open');
+        }
+
+        function saveNotes() {
+            if (!editingNotesId) return;
+            const clients = getClients();
+            const c = clients.find(x => x.id === editingNotesId);
+            if (!c) return;
+            c.notes = document.getElementById('notesText').value.trim();
+            c.callStatus = document.getElementById('notesCallStatus').value;
+            c.decision = document.getElementById('notesDecision').value;
+            if (!c.lastCalled) c.lastCalled = new Date().toISOString().split('T')[0];
+            saveClients(clients);
+            closeNotesModal();
+            render();
+            DB.toast('Saved');
+        }
+
+        function closeNotesModal() {
+            editingNotesId = null;
+            document.getElementById('notesModal').classList.remove('open');
+        }
+
+        function deleteClient(id) {
+            if (!confirm('Delete this client?')) return;
+            const clients = getClients().filter(c => c.id !== id);
+            saveClients(clients);
+            render();
+            DB.toast('Client deleted');
+        }
+
+        function exportClients() {
+            const clients = getClients();
+            if (!clients.length) { DB.toast('No clients to export', 'error'); return; }
+            const headers = ['Name','Phone','City','Category','Rating','Reviews','Address','Website','Source','Lead Type','Cabinet Confidence','Cabinet Reason','Source URL','Call Status','Decision','Notes','Last Called'];
+            const rows = clients.map(c => [
+                '"' + (c.name || '').replace(/"/g, '""') + '"',
+                c.phone || '',
+                '"' + (c.city || '').replace(/"/g, '""') + '"',
+                c.category || '',
+                c.rating || '',
+                c.reviews || '',
+                '"' + (c.address || '').replace(/"/g, '""') + '"',
+                c.website || '',
+                c.source || '',
+                c.leadType || '',
+                c.cabinetConfidence || '',
+                '"' + (c.cabinetReason || '').replace(/"/g, '""') + '"',
+                c.sourceUrl || '',
+                c.callStatus || '',
+                c.decision || '',
+                '"' + (c.notes || '').replace(/"/g, '""') + '"',
+                c.lastCalled || ''
+            ].join(','));
+            const csv = '\uFEFF' + headers.join(',') + '\n' + rows.join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'clients-' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+            URL.revokeObjectURL(blob);
+            DB.toast('CSV exported');
+        }
+
+        function esc(s) {
+            if (!s) return '';
+            var d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        init();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,193 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/images/logo.png">
+    <title>Testimonials — Mediasoft Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+<script src="js/auth.js"></script></head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/images/logo.png" alt="Mediasoft">
+                <span>Mediasoft</span>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav"></nav>
+            <div class="sidebar-footer" id="sidebarFooter"></div>
+        </aside>
+        <main class="main-content">
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                    <h2>Testimonials</h2>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" onclick="openModal()"><i class="fa-solid fa-plus"></i> Add Testimonial</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-wrap">
+                    <table><thead><tr>
+                        <th style="width:30px"></th>
+                        <th>Author / Client</th>
+                        <th>Quote</th>
+                        <th style="width:60px">Status</th>
+                        <th style="width:160px">Actions</th>
+                    </tr></thead>
+                    <tbody id="testimonialsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal" style="max-width:650px;">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Testimonial</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="form-group"><label>Author / Client Name</label><input class="form-control" id="fAuthor" required></div>
+                <div class="form-group"><label>Role / Company</label><input class="form-control" id="fRole"></div>
+                <div class="form-group"><label>Quote</label><textarea class="form-control" id="fQuote" rows="3" required></textarea></div>
+                <div class="form-group"><label>Avatar Initials</label><input class="form-control" id="fAvatar" maxlength="4" placeholder="e.g. ET"></div>
+                <div class="form-group"><label>Gradient Color</label>
+                    <select class="form-control" id="fColor">
+                        <option value="gradient-1">Blue</option>
+                        <option value="gradient-2">Cyan</option>
+                        <option value="gradient-3">Purple</option>
+                        <option value="gradient-4">Orange</option>
+                        <option value="gradient-5">Green</option>
+                        <option value="gradient-6">Pink</option>
+                        <option value="gradient-7">Teal</option>
+                        <option value="gradient-8">Indigo</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Status</label>
+                    <select class="form-control" id="fStatus">
+                        <option value="published">Published</option>
+                        <option value="draft">Draft</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveTestimonial()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/db.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+        initLayout('testimonials');
+
+        async function init() {
+            await DB.init();
+            renderTable();
+        }
+
+        function renderTable() {
+            const data = DB.get('testimonials').filter(t => t.status !== 'deleted').sort((a,b) => (a.sortOrder||999) - (b.sortOrder||999));
+            const tbody = document.getElementById('testimonialsTable');
+            if (!data.length) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-muted);">No testimonials yet.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = data.map((t, i) => `
+                <tr>
+                    <td class="drag-handle" draggable="true" data-id="${t.id}"><i class="fa-solid fa-grip-vertical"></i></td>
+                    <td><strong>${t.author}</strong><br><small style="color:var(--text-muted);">${t.role || ''}</small></td>
+                    <td style="max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">"${t.quote ? (t.quote.length > 80 ? t.quote.slice(0,80) + '...' : t.quote) : ''}"</td>
+                    <td><span class="badge ${t.status === 'published' ? 'badge-success' : 'badge-warning'}" style="cursor:pointer;" onclick="toggleStatus(${t.id})">${t.status || 'draft'}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-ghost" onclick="editTestimonial(${t.id})"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-sm btn-ghost" onclick="duplicateTestimonial(${t.id})"><i class="fa-solid fa-copy"></i></button>
+                        <button class="btn btn-sm btn-ghost" style="color:var(--danger);" onclick="deleteTestimonial(${t.id})"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openModal(data) {
+            document.getElementById('editId').value = data ? data.id : '';
+            document.getElementById('fAuthor').value = data ? data.author : '';
+            document.getElementById('fRole').value = data ? (data.role || '') : '';
+            document.getElementById('fQuote').value = data ? data.quote : '';
+            document.getElementById('fAvatar').value = data ? (data.avatar || '') : '';
+            document.getElementById('fColor').value = data ? (data.color || 'gradient-1') : 'gradient-1';
+            document.getElementById('fStatus').value = data ? (data.status || 'published') : 'published';
+            document.getElementById('modalTitle').textContent = data ? 'Edit Testimonial' : 'Add Testimonial';
+            document.getElementById('modal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('open');
+            document.getElementById('editId').value = '';
+        }
+
+        function saveTestimonial() {
+            const id = document.getElementById('editId').value;
+            const data = {
+                author: document.getElementById('fAuthor').value.trim(),
+                role: document.getElementById('fRole').value.trim(),
+                quote: document.getElementById('fQuote').value.trim(),
+                avatar: document.getElementById('fAvatar').value.trim().toUpperCase() || document.getElementById('fAuthor').value.trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase(),
+                color: document.getElementById('fColor').value,
+                status: document.getElementById('fStatus').value
+            };
+            if (!data.author || !data.quote) { DB.toast('Author and quote are required', 'error'); return; }
+            if (id) {
+                DB.update('testimonials', parseInt(id), data);
+                DB.toast('Testimonial updated');
+            } else {
+                DB.add('testimonials', data);
+                DB.toast('Testimonial added');
+            }
+            closeModal();
+            renderTable();
+        }
+
+        function editTestimonial(id) {
+            const t = DB.getById('testimonials', id);
+            if (t) openModal(t);
+        }
+
+        function duplicateTestimonial(id) {
+            const t = DB.getById('testimonials', id);
+            if (!t) return;
+            const copy = { ...t };
+            delete copy.id;
+            copy.author = t.author + ' (copy)';
+            DB.add('testimonials', copy);
+            DB.toast('Testimonial duplicated');
+            renderTable();
+        }
+
+        function deleteTestimonial(id) {
+            if (!confirm('Delete this testimonial?')) return;
+            DB.delete('testimonials', id);
+            DB.toast('Testimonial deleted');
+            renderTable();
+        }
+
+        function toggleStatus(id) {
+            const t = DB.getById('testimonials', id);
+            if (t) {
+                DB.update('testimonials', id, { status: t.status === 'published' ? 'draft' : 'published' });
+                DB.toast(t.status === 'published' ? 'Testimonial hidden' : 'Testimonial published');
+                renderTable();
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
+

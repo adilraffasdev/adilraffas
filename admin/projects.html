@@ -1,0 +1,331 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/images/logo.png">
+    <title>Projects — Mediasoft Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+<script src="js/auth.js"></script></head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/images/logo.png" alt="Mediasoft">
+                <span>Mediasoft</span>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav"></nav>
+            <div class="sidebar-footer" id="sidebarFooter"></div>
+        </aside>
+        <main class="main-content">
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                    <h2>Projects / Portfolio</h2>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-secondary" onclick="document.getElementById('importFileInput').click()" title="Import projects from JSON file"><i class="fa-solid fa-upload"></i> Import JSON</button>
+                    <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importProjectsFromFile(this)">
+                    <button class="btn btn-secondary" onclick="importProjects()" title="Reset to default projects"><i class="fa-solid fa-rotate"></i> Reset Data</button>
+                    <button class="btn btn-secondary" onclick="exportProjectsData()" title="Export all projects as JSON"><i class="fa-solid fa-download"></i> Export Data</button>
+                    <button class="btn btn-primary" onclick="addProject()"><i class="fa-solid fa-plus"></i> Add Project</button>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search projects..." oninput="renderTable()">
+                </div>
+                <select class="form-control" id="filterCategory" style="width:auto;" onchange="renderTable()">
+                    <option value="">All Categories</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Mobile App">Mobile App</option>
+                    <option value="Desktop App">Desktop App</option>
+                    <option value="Branding">Branding</option>
+                    <option value="Digital Marketing">Digital Marketing</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <div class="table-wrap">
+                    <table><thead><tr>
+                        <th style="width:30px"></th>
+                        <th>Title</th>
+                        <th>Client</th>
+                        <th>Category</th>
+                        <th style="width:60px">Featured</th>
+                        <th style="width:60px">Status</th>
+                        <th style="width:160px">Actions</th>
+                    </tr></thead>
+                    <tbody id="projectsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal" style="max-width:750px;">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Project</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group"><label>Title</label><input class="form-control" id="fTitle" required></div>
+                    <div class="form-group"><label>Client</label><input class="form-control" id="fClient"></div>
+                </div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group"><label>Category</label>
+                        <select class="form-control" id="fCategory">
+                            <option value="Web Development">Web Development</option>
+                            <option value="Mobile App">Mobile App</option>
+                            <option value="Desktop App">Desktop App</option>
+                            <option value="Branding">Branding</option>
+                            <option value="Digital Marketing">Digital Marketing</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Completion Date</label><input class="form-control" id="fDate" type="date"></div>
+                </div>
+                <div class="form-group"><label>Short Description</label><textarea class="form-control" id="fShortDesc" rows="2"></textarea></div>
+                <div class="form-group"><label>Full Description</label><textarea class="form-control" id="fFullDesc" rows="4"></textarea></div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group"><label>Technologies (comma separated)</label><input class="form-control" id="fTech" placeholder="React, Node.js"></div>
+                    <div class="form-group"><label>Website URL</label><input class="form-control" id="fUrl" placeholder="https://"></div>
+                </div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group"><label>Featured Image</label>
+                        <input class="form-control" id="fImage" placeholder="URL or upload below">
+                        <div style="margin-top:6px;display:flex;align-items:center;gap:8px;"><label for="fImageUpload" style="font-size:0.8rem;cursor:pointer;color:var(--secondary);"><i class="fa-solid fa-upload"></i> Upload file</label><input type="file" id="fImageUpload" accept="image/*" style="display:none;" onchange="handleImageUpload(this)"></div>
+                        <div id="fImagePreview" style="display:none;margin-top:8px;"><img style="max-width:150px;border-radius:6px;border:1px solid var(--border);"></div>
+                    </div>
+                    <div class="form-group"><label>Slug</label><input class="form-control" id="fSlug" placeholder="project-slug"></div>
+                </div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group"><label>SEO Title</label><input class="form-control" id="fSeoTitle"></div>
+                </div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <label style="display:flex;align-items:center;gap:8px;">
+                        <input type="checkbox" id="fFeatured"> Featured project
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveProject()"><i class="fa-solid fa-check"></i> Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js?2"></script>
+    <script src="js/db.js?2"></script>
+    <script src="assets/excel/projects.data.js"></script>
+    <script>
+        initLayout('projects');
+
+        async function init() {
+            await DB.init();
+            const data = DB.get('projects');
+            const isStale = !data || data.length < PROJECTS_DEFAULT.length;
+            if (isStale && typeof PROJECTS_DEFAULT !== 'undefined' && PROJECTS_DEFAULT.length) {
+                DB.set('projects', PROJECTS_DEFAULT);
+            }
+            renderTable();
+        }
+
+        function importProjectsFromFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!Array.isArray(data)) { DB.toast('Invalid format: expected an array', 'error'); return; }
+                    if (!confirm('Import ' + data.length + ' projects? This will overwrite current data.')) return;
+                    DB.set('projects', data);
+                    renderTable();
+                    DB.toast(data.length + ' projects imported');
+                } catch (err) {
+                    DB.toast('Invalid JSON file: ' + err.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        function importProjects() {
+            if (typeof PROJECTS_DEFAULT === 'undefined' || !PROJECTS_DEFAULT.length) {
+                DB.toast('Default projects data not found', 'error');
+                return;
+            }
+            if (!confirm('Reset all projects to default data? This will overwrite your changes.')) return;
+            DB.set('projects', PROJECTS_DEFAULT);
+            renderTable();
+            DB.toast('Reset to ' + PROJECTS_DEFAULT.length + ' projects');
+        }
+
+        function getData() {
+            let data = DB.get('projects');
+            const q = (document.getElementById('searchInput').value || '').toLowerCase();
+            const cat = document.getElementById('filterCategory').value;
+            if (q) data = data.filter(p => p.title.toLowerCase().includes(q) || (p.client || '').toLowerCase().includes(q));
+            if (cat) data = data.filter(p => p.category === cat);
+            return data.sort((a,b) => (a.sortOrder || 999) - (b.sortOrder || 999));
+        }
+
+        function renderTable() {
+            const data = getData();
+            document.getElementById('projectsTable').innerHTML = data.map(p => `
+                <tr draggable="true" data-id="${p.id}">
+                    <td class="drag-handle"><i class="fa-solid fa-grip-vertical"></i></td>
+                    <td><strong>${p.title}</strong><br><small style="color:var(--text-muted);">${(p.shortDescription || '').substring(0, 50)}</small></td>
+                    <td>${p.client || '-'}</td>
+                    <td><span class="badge badge-info">${p.category || '-'}</span></td>
+                    <td>${p.featured ? '<span class="badge badge-warning"><i class="fa-solid fa-star"></i></span>' : '-'}</td>
+                    <td><label class="toggle"><input type="checkbox" ${p.status === 'published' ? 'checked' : ''} onchange="toggleStatus(${p.id})"><span class="toggle-slider"></span></label></td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="editProject(${p.id})"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-sm" onclick="duplicateProject(${p.id})" style="background:rgba(3,150,250,0.15);color:var(--secondary);border:none;border-radius:8px;padding:6px 12px;cursor:pointer;"><i class="fa-solid fa-copy"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteProject(${p.id})"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function handleImageUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const maxW = 800, maxH = 600, quality = 0.6;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    let w = img.width, h = img.height;
+                    if (w > maxW) { h *= maxW / w; w = maxW; }
+                    if (h > maxH) { w *= maxH / h; h = maxH; }
+                    const c = document.createElement('canvas');
+                    c.width = w; c.height = h;
+                    const ctx = c.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    const dataUrl = c.toDataURL('image/jpeg', quality);
+                    document.getElementById('fImage').value = dataUrl;
+                    const preview = document.getElementById('fImagePreview');
+                    preview.style.display = 'block';
+                    preview.querySelector('img').src = dataUrl;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function openModal(data) {
+            document.getElementById('editId').value = data ? data.id : '';
+            document.getElementById('fTitle').value = data ? data.title : '';
+            document.getElementById('fClient').value = data ? data.client : '';
+            document.getElementById('fCategory').value = data ? data.category : 'Web Development';
+            document.getElementById('fDate').value = data ? data.completionDate : '';
+            document.getElementById('fShortDesc').value = data ? data.shortDescription : '';
+            document.getElementById('fFullDesc').value = data ? data.fullDescription : '';
+            document.getElementById('fTech').value = data ? (data.technologies || []).join(', ') : '';
+            document.getElementById('fUrl').value = data ? data.websiteUrl : '';
+            document.getElementById('fSlug').value = data ? data.slug : '';
+            document.getElementById('fSeoTitle').value = data ? data.seoTitle : '';
+            document.getElementById('fFeatured').checked = data ? data.featured : false;
+            const img = data ? data.featuredImage || '' : '';
+            document.getElementById('fImage').value = img;
+            const preview = document.getElementById('fImagePreview');
+            if (img) { preview.style.display = 'block'; preview.querySelector('img').src = img; } else { preview.style.display = 'none'; }
+            document.getElementById('modalTitle').textContent = data ? 'Edit Project' : 'Add Project';
+            document.getElementById('modal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('open');
+            document.getElementById('editId').value = '';
+        }
+
+        function saveProject() {
+            const id = document.getElementById('editId').value;
+            const slug = document.getElementById('fSlug').value.trim() || document.getElementById('fTitle').value.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            const data = {
+                title: document.getElementById('fTitle').value.trim(),
+                client: document.getElementById('fClient').value.trim(),
+                category: document.getElementById('fCategory').value,
+                shortDescription: document.getElementById('fShortDesc').value.trim(),
+                fullDescription: document.getElementById('fFullDesc').value.trim(),
+                featuredImage: document.getElementById('fImage').value.trim(),
+                gallery: [],
+                technologies: document.getElementById('fTech').value.split(',').map(t => t.trim()).filter(Boolean),
+                websiteUrl: document.getElementById('fUrl').value.trim(),
+                completionDate: document.getElementById('fDate').value,
+                featured: document.getElementById('fFeatured').checked,
+                status: 'published',
+                slug,
+                seoTitle: document.getElementById('fSeoTitle').value.trim(),
+                seoDescription: ''
+            };
+            if (!data.title) { DB.toast('Title is required', 'error'); return; }
+            if (id) {
+                DB.update('projects', parseInt(id), data);
+                DB.toast('Project updated');
+            } else {
+                DB.add('projects', data);
+                DB.toast('Project added');
+            }
+            closeModal();
+            renderTable();
+        }
+
+        function editProject(id) {
+            const p = DB.getById('projects', id);
+            if (p) openModal(p);
+        }
+
+        function duplicateProject(id) {
+            const p = DB.getById('projects', id);
+            if (!p) return;
+            const copy = { ...p };
+            delete copy.id;
+            copy.title = p.title + ' (copy)';
+            copy.featured = false;
+            DB.add('projects', copy);
+            DB.toast('Project duplicated');
+            renderTable();
+        }
+
+        function deleteProject(id) {
+            if (!confirm('Delete this project?')) return;
+            DB.delete('projects', id);
+            DB.toast('Project deleted');
+            renderTable();
+        }
+
+        function toggleStatus(id) {
+            const p = DB.getById('projects', id);
+            if (p) {
+                DB.update('projects', id, { status: p.status === 'published' ? 'draft' : 'published' });
+                DB.toast(p.status === 'published' ? 'Project hidden' : 'Project published');
+            }
+        }
+
+        function exportProjectsData() {
+            const data = DB.get('projects');
+            if (!data.length) { DB.toast('No projects to export', 'error'); return; }
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'projects-default.json';
+            a.click();
+            URL.revokeObjectURL(blob);
+            DB.toast('Exported ' + data.length + ' projects');
+        }
+
+        init();
+    </script>
+</body>
+</html>
+

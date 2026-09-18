@@ -1,0 +1,209 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/images/logo.png">
+    <title>Packages — Mediasoft Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+<script src="js/auth.js"></script></head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/images/logo.png" alt="Mediasoft">
+                <span>Mediasoft</span>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav"></nav>
+            <div class="sidebar-footer" id="sidebarFooter"></div>
+        </aside>
+        <main class="main-content">
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                    <h2>Packages / Pricing</h2>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" onclick="openModal()"><i class="fa-solid fa-plus"></i> Add Package</button>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search packages..." oninput="renderTable()">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-wrap">
+                    <table><thead><tr>
+                        <th style="width:30px"></th>
+                        <th>Title</th>
+                        <th>Price</th>
+                        <th>Features</th>
+                        <th style="width:70px">Popular</th>
+                        <th style="width:70px">Status</th>
+                        <th style="width:160px">Actions</th>
+                    </tr></thead>
+                    <tbody id="packagesTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal" style="max-width:700px;">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Package</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="form-row" style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;">
+                    <div class="form-group"><label>Title</label><input class="form-control" id="fTitle" required></div>
+                    <div class="form-group"><label>Price</label><input class="form-control" id="fPrice" type="number" required></div>
+                    <div class="form-group"><label>Currency</label><input class="form-control" id="fCurrency" value="MAD"></div>
+                </div>
+                <div class="form-group"><label>Description</label><input class="form-control" id="fDesc" placeholder="One-time setup · delivered in 3 days"></div>
+                <div class="form-group"><label>Features (one per line)</label><textarea class="form-control" id="fFeatures" rows="5" placeholder="Simple 1-page website&#10;Mobile-responsive design"></textarea></div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                    <div class="form-group"><label>Button Text</label><input class="form-control" id="fBtnText" placeholder="Choose Basic"></div>
+                    <div class="form-group"><label>Button URL</label><input class="form-control" id="fBtnUrl" placeholder="#contact"></div>
+                    <div class="form-group"><label>Accent Color</label><input class="form-control" id="fAccent" type="color" value="#005CD8"></div>
+                </div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <label class="form-group" style="display:flex;align-items:center;gap:8px;">
+                        <input type="checkbox" id="fPopular"> Mark as Popular / Best seller
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="savePackage()"><i class="fa-solid fa-check"></i> Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js?2"></script>
+    <script src="js/db.js?2"></script>
+    <script>
+        initLayout('packages');
+
+        async function init() {
+            await DB.init();
+            renderTable();
+        }
+
+        function getData() {
+            let data = DB.get('packages');
+            const q = (document.getElementById('searchInput').value || '').toLowerCase();
+            if (q) data = data.filter(p => p.title.toLowerCase().includes(q));
+            return data.sort((a,b) => (a.sortOrder || 999) - (b.sortOrder || 999));
+        }
+
+        function renderTable() {
+            const data = getData();
+            document.getElementById('packagesTable').innerHTML = data.map(p => `
+                <tr draggable="true" data-id="${p.id}">
+                    <td class="drag-handle"><i class="fa-solid fa-grip-vertical"></i></td>
+                    <td><strong>${p.title}</strong></td>
+                    <td>${p.price ? p.price.toLocaleString() + ' ' + (p.currency || 'MAD') : '-'}</td>
+                    <td>${(p.features || []).length} features</td>
+                    <td>${p.popular ? '<span class="badge badge-warning">Best seller</span>' : '-'}</td>
+                    <td><label class="toggle"><input type="checkbox" ${p.status === 'visible' ? 'checked' : ''} onchange="toggleStatus(${p.id})"><span class="toggle-slider"></span></label></td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="editPackage(${p.id})"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-sm btn-info" onclick="duplicatePackage(${p.id})" style="background:rgba(3,150,250,0.15);color:var(--secondary);"><i class="fa-solid fa-copy"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="deletePackage(${p.id})"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openModal(data) {
+            document.getElementById('editId').value = data ? data.id : '';
+            document.getElementById('fTitle').value = data ? data.title : '';
+            document.getElementById('fPrice').value = data ? data.price : '';
+            document.getElementById('fCurrency').value = data ? data.currency : 'MAD';
+            document.getElementById('fDesc').value = data ? data.description : '';
+            document.getElementById('fFeatures').value = data ? (data.features || []).join('\n') : '';
+            document.getElementById('fBtnText').value = data ? data.btnText : 'Choose';
+            document.getElementById('fBtnUrl').value = data ? data.btnUrl : '#contact';
+            document.getElementById('fAccent').value = data ? data.accentColor : '#005CD8';
+            document.getElementById('fPopular').checked = data ? data.popular : false;
+            document.getElementById('modalTitle').textContent = data ? 'Edit Package' : 'Add Package';
+            document.getElementById('modal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('open');
+            document.getElementById('editId').value = '';
+        }
+
+        function savePackage() {
+            const id = document.getElementById('editId').value;
+            const features = document.getElementById('fFeatures').value.split('\n').map(f => f.trim()).filter(Boolean);
+            const data = {
+                title: document.getElementById('fTitle').value.trim(),
+                price: parseFloat(document.getElementById('fPrice').value) || 0,
+                currency: document.getElementById('fCurrency').value.trim() || 'MAD',
+                description: document.getElementById('fDesc').value.trim(),
+                features,
+                btnText: document.getElementById('fBtnText').value.trim(),
+                btnUrl: document.getElementById('fBtnUrl').value.trim(),
+                accentColor: document.getElementById('fAccent').value,
+                popular: document.getElementById('fPopular').checked,
+                status: 'visible'
+            };
+            if (!data.title) { DB.toast('Title is required', 'error'); return; }
+            if (id) {
+                DB.update('packages', parseInt(id), data);
+                DB.toast('Package updated');
+            } else {
+                DB.add('packages', data);
+                DB.toast('Package added');
+            }
+            closeModal();
+            renderTable();
+        }
+
+        function editPackage(id) {
+            const p = DB.getById('packages', id);
+            if (p) openModal(p);
+        }
+
+        function duplicatePackage(id) {
+            const p = DB.getById('packages', id);
+            if (!p) return;
+            const copy = { ...p };
+            delete copy.id;
+            copy.title = p.title + ' (copy)';
+            copy.popular = false;
+            DB.add('packages', copy);
+            DB.toast('Package duplicated');
+            renderTable();
+        }
+
+        function deletePackage(id) {
+            if (!confirm('Delete this package?')) return;
+            DB.delete('packages', id);
+            DB.toast('Package deleted');
+            renderTable();
+        }
+
+        function toggleStatus(id) {
+            const p = DB.getById('packages', id);
+            if (p) {
+                DB.update('packages', id, { status: p.status === 'visible' ? 'hidden' : 'visible' });
+                DB.toast(p.status === 'visible' ? 'Package hidden' : 'Package visible');
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
+

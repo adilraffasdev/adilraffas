@@ -1,0 +1,306 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/images/logo.png">
+    <title>Blog — Mediasoft Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+<script src="js/auth.js"></script></head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/images/logo.png" alt="Mediasoft">
+                <span>Mediasoft</span>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav"></nav>
+            <div class="sidebar-footer" id="sidebarFooter"></div>
+        </aside>
+        <main class="main-content">
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                    <h2>Blog Posts</h2>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-secondary" onclick="document.getElementById('importFileInput').click()" title="Import blogs from JSON file"><i class="fa-solid fa-upload"></i> Import JSON</button>
+                    <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importBlogsFromFile(this)">
+                    <button class="btn btn-secondary" onclick="importBlogs()" title="Reset to default blog posts"><i class="fa-solid fa-rotate"></i> Reset Data</button>
+                    <button class="btn btn-secondary" onclick="exportBlogsData()" title="Export all blogs as JSON"><i class="fa-solid fa-download"></i> Export Data</button>
+                    <button class="btn btn-primary" onclick="addBlog()"><i class="fa-solid fa-plus"></i> Add Blog</button>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search posts..." oninput="renderTable()">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-wrap">
+                    <table><thead><tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Author</th>
+                        <th>Date</th>
+                        <th style="width:80px">Status</th>
+                        <th style="width:120px">Actions</th>
+                    </tr></thead>
+                    <tbody id="blogsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal" style="max-width:750px;">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Blog Post</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="form-row" style="display:grid;grid-template-columns:2fr 1fr;gap:12px;">
+                    <div class="form-group"><label>Title</label><input class="form-control" id="fTitle" required></div>
+                    <div class="form-group"><label>Category</label>
+                        <select class="form-control" id="fCategory">
+                            <option value="Web Development">Web Development</option>
+                            <option value="Branding">Branding</option>
+                            <option value="Digital Marketing">Digital Marketing</option>
+                            <option value="Business">Business</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group"><label>Slug</label><input class="form-control" id="fSlug" placeholder="auto-generated"></div>
+                    <div class="form-group"><label>Image URL</label><input class="form-control" id="fImage" placeholder="https://..."><div style="margin-top:6px;display:flex;align-items:center;gap:8px;"><label for="fImageUpload" style="font-size:0.8rem;cursor:pointer;color:var(--secondary);"><i class="fa-solid fa-upload"></i> Upload file</label><input type="file" id="fImageUpload" accept="image/*" style="display:none;" onchange="handleImageUpload(this)"></div></div>
+                </div>
+                <div id="fImagePreview" style="display:none;margin-bottom:12px;"><img style="max-width:200px;border-radius:8px;border:1px solid var(--border);"></div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group"><label>Tags (comma separated)</label><input class="form-control" id="fTags" placeholder="React, SEO"></div>
+                    <div class="form-group"><label>SEO Description</label><input class="form-control" id="fSeoDesc"></div>
+                </div>
+                <div class="form-group"><label>Excerpt</label><textarea class="form-control" id="fExcerpt" rows="2"></textarea></div>
+                <div class="form-group"><label>Content (HTML)</label><textarea class="form-control rich-editor" id="fContent" rows="10"></textarea></div>
+                <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                    <div class="form-group"><label>Author</label><input class="form-control" id="fAuthor" value="Mediasoft"></div>
+                    <div class="form-group"><label>Reading Time</label><input class="form-control" id="fReadingTime" placeholder="5 min"></div>
+                    <div class="form-group"><label>SEO Title</label><input class="form-control" id="fSeoTitle"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-secondary" onclick="saveDraft()"><i class="fa-solid fa-file"></i> Save Draft</button>
+                <button class="btn btn-primary" onclick="saveBlog()"><i class="fa-solid fa-check"></i> Publish</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js?2"></script>
+    <script src="js/db.js?2"></script>
+    <script src="assets/excel/blogs.data.js"></script>
+    <script>
+        initLayout('blogs');
+
+        async function init() {
+            await DB.init();
+            const data = DB.get('blogs');
+            const isStale = !data || data.length < BLOGS_DEFAULT.length;
+            if (isStale && typeof BLOGS_DEFAULT !== 'undefined' && BLOGS_DEFAULT.length) {
+                DB.set('blogs', BLOGS_DEFAULT);
+            }
+            renderTable();
+        }
+
+        function importBlogsFromFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!Array.isArray(data)) { DB.toast('Invalid format: expected an array', 'error'); return; }
+                    if (!confirm('Import ' + data.length + ' blog posts? This will overwrite current data.')) return;
+                    DB.set('blogs', data);
+                    renderTable();
+                    DB.toast(data.length + ' blog posts imported');
+                } catch (err) {
+                    DB.toast('Invalid JSON file: ' + err.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        function importBlogs() {
+            if (typeof BLOGS_DEFAULT === 'undefined' || !BLOGS_DEFAULT.length) {
+                DB.toast('Default blogs data not found', 'error');
+                return;
+            }
+            if (!confirm('Reset all blog posts to default data? This will overwrite your changes.')) return;
+            DB.set('blogs', BLOGS_DEFAULT);
+            renderTable();
+            DB.toast('Reset to ' + BLOGS_DEFAULT.length + ' blog posts');
+        }
+
+        function getData() {
+            let data = DB.get('blogs');
+            const q = (document.getElementById('searchInput').value || '').toLowerCase();
+            if (q) data = data.filter(b => b.title.toLowerCase().includes(q));
+            return data.sort((a,b) => new Date(b.publishDate || 0) - new Date(a.publishDate || 0));
+        }
+
+        function renderTable() {
+            const data = getData();
+            document.getElementById('blogsTable').innerHTML = data.map(b => `
+                <tr>
+                    <td><strong>${b.title}</strong><br><small style="color:var(--text-muted);">${(b.excerpt || '').substring(0, 60)}</small></td>
+                    <td><span class="badge badge-info">${b.category || '-'}</span></td>
+                    <td>${b.author || 'Mediasoft'}</td>
+                    <td style="font-size:0.85rem;color:var(--text-muted);">${b.publishDate || '-'}</td>
+                    <td>${b.status === 'published' ? '<span class="badge badge-success">Published</span>' : '<span class="badge badge-warning">Draft</span>'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="editBlog(${b.id})"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteBlog(${b.id})"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openModal(data) {
+            document.getElementById('editId').value = data ? data.id : '';
+            document.getElementById('fTitle').value = data ? data.title : '';
+            document.getElementById('fCategory').value = data ? data.category : 'Web Development';
+            document.getElementById('fSlug').value = data ? data.slug : '';
+            const img = data ? data.featuredImage || '' : '';
+            document.getElementById('fImage').value = img;
+            document.getElementById('fTags').value = data ? (data.tags || []).join(', ') : '';
+            document.getElementById('fSeoDesc').value = data ? data.seoDescription || '' : '';
+            const preview = document.getElementById('fImagePreview');
+            if (img) { preview.style.display = 'block'; preview.querySelector('img').src = img; } else { preview.style.display = 'none'; }
+            document.getElementById('fExcerpt').value = data ? data.excerpt : '';
+            document.getElementById('fContent').value = data ? data.content : '';
+            document.getElementById('fAuthor').value = data ? data.author : 'Mediasoft';
+            document.getElementById('fReadingTime').value = data ? data.readingTime : '';
+            document.getElementById('fSeoTitle').value = data ? data.seoTitle : '';
+            document.getElementById('modalTitle').textContent = data ? 'Edit Blog Post' : 'Add Blog Post';
+            document.getElementById('modal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('open');
+            document.getElementById('editId').value = '';
+        }
+
+        function handleImageUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const maxW = 600, maxH = 450, quality = 0.5;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    let w = img.width, h = img.height;
+                    if (w > maxW) { h *= maxW / w; w = maxW; }
+                    if (h > maxH) { w *= maxH / h; h = maxH; }
+                    const c = document.createElement('canvas');
+                    c.width = w; c.height = h;
+                    const ctx = c.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    const dataUrl = c.toDataURL('image/jpeg', quality);
+                    document.getElementById('fImage').value = dataUrl;
+                    const preview = document.getElementById('fImagePreview');
+                    preview.style.display = 'block';
+                    preview.querySelector('img').src = dataUrl;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function collectData() {
+            const title = document.getElementById('fTitle').value.trim();
+            const slug = document.getElementById('fSlug').value.trim() || title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            return {
+                title,
+                slug,
+                category: document.getElementById('fCategory').value,
+                tags: document.getElementById('fTags').value.split(',').map(t => t.trim()).filter(Boolean),
+                featuredImage: document.getElementById('fImage').value.trim(),
+                content: document.getElementById('fContent').value,
+                excerpt: document.getElementById('fExcerpt').value.trim(),
+                author: document.getElementById('fAuthor').value.trim() || 'Mediasoft',
+                publishDate: new Date().toISOString().split('T')[0],
+                readingTime: document.getElementById('fReadingTime').value.trim() || Math.ceil(document.getElementById('fContent').value.split(' ').length / 200) + ' min',
+                seoTitle: document.getElementById('fSeoTitle').value.trim(),
+                seoDescription: document.getElementById('fSeoDesc').value.trim() || document.getElementById('fExcerpt').value.trim()
+            };
+        }
+
+        function saveBlog() {
+            const id = document.getElementById('editId').value;
+            const data = collectData();
+            data.status = 'published';
+            if (!data.title) { DB.toast('Title is required', 'error'); return; }
+            if (id) {
+                DB.update('blogs', parseInt(id), data);
+                DB.toast('Blog published');
+            } else {
+                DB.add('blogs', data);
+                DB.toast('Blog published');
+            }
+            closeModal();
+            renderTable();
+        }
+
+        function saveDraft() {
+            const id = document.getElementById('editId').value;
+            const data = collectData();
+            data.status = 'draft';
+            if (!data.title) { DB.toast('Title is required', 'error'); return; }
+            if (id) {
+                DB.update('blogs', parseInt(id), data);
+                DB.toast('Draft saved');
+            } else {
+                DB.add('blogs', data);
+                DB.toast('Draft saved');
+            }
+            closeModal();
+            renderTable();
+        }
+
+        function editBlog(id) {
+            const b = DB.getById('blogs', id);
+            if (b) openModal(b);
+        }
+
+        function deleteBlog(id) {
+            if (!confirm('Delete this blog post?')) return;
+            DB.delete('blogs', id);
+            DB.toast('Blog deleted');
+            renderTable();
+        }
+
+        function exportBlogsData() {
+            const data = DB.get('blogs');
+            if (!data.length) { DB.toast('No blogs to export', 'error'); return; }
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'blogs-default.json';
+            a.click();
+            URL.revokeObjectURL(blob);
+            DB.toast('Exported ' + data.length + ' blogs');
+        }
+
+        init();
+    </script>
+</body>
+</html>
+

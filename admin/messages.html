@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/images/logo.png">
+    <title>Messages — Mediasoft Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+<script src="js/auth.js"></script></head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/images/logo.png" alt="Mediasoft">
+                <span>Mediasoft</span>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav"></nav>
+            <div class="sidebar-footer" id="sidebarFooter"></div>
+        </aside>
+        <main class="main-content">
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                    <h2>Messages</h2>
+                </div>
+                <div class="topbar-actions"></div>
+            </div>
+
+            <div class="stats-grid" id="messagesStats"></div>
+
+            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+                <button class="btn btn-sm btn-primary" id="filterAll" onclick="setFilter('all')">All</button>
+                <button class="btn btn-sm btn-warning" id="filterUnread" onclick="setFilter('unread')">Unread</button>
+                <button class="btn btn-sm btn-secondary" id="filterRead" onclick="setFilter('read')">Read</button>
+            </div>
+
+            <div class="card">
+                <div class="table-wrap">
+                    <table><thead><tr>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Pack</th>
+                        <th>Budget</th>
+                        <th>Message</th>
+                        <th style="width:90px">Actions</th>
+                    </tr></thead>
+                    <tbody id="messagesTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="msgModal">
+        <div class="modal" style="max-width:600px;">
+            <div class="modal-header">
+                <h3 id="msgModalTitle">Message Details</h3>
+                <button class="modal-close" onclick="closeMsgModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="msgModalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeMsgModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js?2"></script>
+    <script src="js/db.js?2"></script>
+    <script>
+        initLayout('messages');
+        let filterType = 'all';
+
+        async function init() {
+            await DB.init();
+            render();
+            updateMsgBadge();
+        }
+
+        function getMessages() {
+            try {
+                const d = localStorage.getItem('mediasoft_messages');
+                return d ? JSON.parse(d) : [];
+            } catch { return []; }
+        }
+
+        function saveMessages(arr) {
+            localStorage.setItem('mediasoft_messages', JSON.stringify(arr));
+        }
+
+        function render() {
+            const msgs = getMessages();
+            const total = msgs.length;
+            const unread = msgs.filter(m => !m.read).length;
+
+            document.getElementById('messagesStats').innerHTML = `
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(3,150,250,0.15);color:var(--secondary);"><i class="fa-solid fa-envelope"></i></div><div class="stat-info"><h4>Total Messages</h4><div class="value">${total}</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,0.15);color:var(--warning);"><i class="fa-solid fa-circle"></i></div><div class="stat-info"><h4>Unread</h4><div class="value">${unread}</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:var(--success);"><i class="fa-solid fa-check-circle"></i></div><div class="stat-info"><h4>Read</h4><div class="value">${total - unread}</div></div></div>
+            `;
+
+            renderTable();
+        }
+
+        function renderTable() {
+            let msgs = getMessages();
+            if (filterType === 'unread') msgs = msgs.filter(m => !m.read);
+            else if (filterType === 'read') msgs = msgs.filter(m => m.read);
+            msgs.sort((a,b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
+
+            document.getElementById('messagesTable').innerHTML = msgs.length
+                ? msgs.map(m => `
+                    <tr style="${!m.read ? 'font-weight:600;' : ''}">
+                        <td style="font-size:0.85rem;color:var(--text-muted);white-space:nowrap;">${m.date}</td>
+                        <td>${esc(m.name)}</td>
+                        <td><a href="mailto:${esc(m.email)}" style="color:var(--secondary);">${esc(m.email)}</a></td>
+                        <td>${m.phone ? esc(m.phone) : '-'}</td>
+                        <td>${m.pack ? `<span style="background:rgba(99,102,241,0.15);color:var(--primary);padding:2px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;">${esc(m.pack)}</span>` : '-'}</td>
+                        <td>${m.budget ? esc(m.budget) : '-'}</td>
+                        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                            <a href="#" onclick="event.preventDefault();viewMessage(${m.id})" style="color:var(--text);">${esc(m.message.substring(0, 60))}${m.message.length > 60 ? '...' : ''}</a>
+                        </td>
+                        <td>
+                            ${!m.read ? `<button class="btn btn-sm btn-success" onclick="markRead(${m.id})" title="Mark as read"><i class="fa-solid fa-check"></i></button>` : ''}
+                            <button class="btn btn-sm btn-secondary" onclick="viewMessage(${m.id})"><i class="fa-solid fa-eye"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteMessage(${m.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('')
+                : '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted);">No messages</td></tr>';
+        }
+
+        function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+        function setFilter(type) {
+            filterType = type;
+            ['all','unread','read'].forEach(t => {
+                const btn = document.getElementById('filter' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (btn) btn.className = 'btn btn-sm ' + (t === type ? (t === 'unread' ? 'btn-warning' : t === 'read' ? 'btn-secondary' : 'btn-primary') : '');
+            });
+            renderTable();
+        }
+
+        function viewMessage(id) {
+            const msgs = getMessages();
+            const m = msgs.find(x => x.id === id);
+            if (!m) return;
+            if (!m.read) markRead(id);
+            document.getElementById('msgModalBody').innerHTML = `
+                <div style="margin-bottom:16px;"><strong>Name:</strong> ${esc(m.name)}</div>
+                <div style="margin-bottom:16px;"><strong>Email:</strong> <a href="mailto:${esc(m.email)}" style="color:var(--secondary);">${esc(m.email)}</a></div>
+                <div style="margin-bottom:16px;"><strong>Phone:</strong> ${m.phone ? esc(m.phone) : '-'}</div>
+                <div style="margin-bottom:16px;"><strong>Date:</strong> ${m.date}</div>
+                <div style="margin-bottom:16px;"><strong>Budget:</strong> ${m.budget ? esc(m.budget) : 'Not specified'}</div>
+                ${m.pack ? `<div style="margin-bottom:16px;"><strong>Selected Pack:</strong> ${esc(m.pack)}</div>` : ''}
+                <div style="margin-bottom:8px;"><strong>Message:</strong></div>
+                <div style="padding:12px;background:var(--bg-card);border-radius:8px;white-space:pre-wrap;line-height:1.6;font-size:0.9rem;">${esc(m.message)}</div>
+            `;
+            document.getElementById('msgModal').classList.add('open');
+        }
+
+        function closeMsgModal() {
+            document.getElementById('msgModal').classList.remove('open');
+        }
+
+        function markRead(id) {
+            const msgs = getMessages();
+            const m = msgs.find(x => x.id === id);
+            if (m) { m.read = true; saveMessages(msgs); render(); updateMsgBadge(); }
+        }
+
+        function deleteMessage(id) {
+            if (!confirm('Delete this message?')) return;
+            let msgs = getMessages();
+            msgs = msgs.filter(x => x.id !== id);
+            saveMessages(msgs);
+            render(); updateMsgBadge();
+        }
+
+        init();
+    </script>
+</body>
+</html>
+
