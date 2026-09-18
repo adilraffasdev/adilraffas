@@ -1,24 +1,15 @@
-function checkAuth() {
-    const session = localStorage.getItem('mediasoft_admin');
-    if (!session) { window.location.href = 'login.html'; return null; }
-    try {
-        const data = JSON.parse(session);
-        if (!data.loggedIn) { window.location.href = 'login.html'; return null; }
-        const elapsed = Date.now() - (data.time || 0);
-        if (elapsed > 3600000) {
-            localStorage.removeItem('mediasoft_admin');
-            window.location.href = 'login.html';
-            return null;
-        }
-        data.time = Date.now();
-        localStorage.setItem('mediasoft_admin', JSON.stringify(data));
-        return data;
-    } catch { window.location.href = 'login.html'; return null; }
+﻿function checkAuth() {
+    var m = document.cookie.match('(^|;)\\s*ar_auth\\s*=\\s*([^;]+)');
+    if (!m || m[2] !== '1') {
+        window.location.replace('/admin/login.html');
+        return null;
+    }
+    return { loggedIn: true };
 }
 
 function logout() {
-    localStorage.removeItem('mediasoft_admin');
-    window.location.href = 'login.html';
+    document.cookie = 'ar_auth=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+    window.location.replace('/admin/login.html');
 }
 
 function initTheme() {
@@ -92,3 +83,4 @@ function updateMsgBadge() {
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
 }
+
