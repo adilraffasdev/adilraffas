@@ -1,29 +1,24 @@
 /**
- * Admin auth guard - bulletproof version
+ * Admin auth guard — cookie-based, no localStorage race condition
  */
-var SESSION_KEY = 'ar_admin_session';
+(function(){
+  var NAME = 'ar_auth';
 
-function checkAuth() {
-  try {
-    var raw = localStorage.getItem(SESSION_KEY);
-    if (!raw) return false;
-    var s = JSON.parse(raw);
-    if (!s || !s.t) return false;
-    // Valid for 24 hours
-    return (Date.now() - s.t) < 86400000;
-  } catch(e) {
-    return false;
+  function getCookie(n) {
+    var m = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
+    return m ? m[2] : null;
   }
-}
 
-// Only redirect if NOT on login page
-if (window.location.pathname.indexOf('login') === -1) {
-  if (!checkAuth()) {
+  // Not on login page → check cookie
+  if (window.location.pathname.indexOf('login') === -1) {
+    if (getCookie(NAME) !== '1') {
+      window.location.replace('/admin/login.html');
+      return;
+    }
+  }
+
+  window.adminLogout = function() {
+    document.cookie = NAME + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
     window.location.replace('/admin/login.html');
-  }
-}
-
-window.adminLogout = function() {
-  localStorage.removeItem(SESSION_KEY);
-  window.location.replace('/admin/login.html');
-};
+  };
+})();
