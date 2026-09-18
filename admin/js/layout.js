@@ -13,7 +13,7 @@ function logout() {
 }
 
 function initTheme() {
-    const saved = localStorage.getItem('mediasoft_theme') || 'dark';
+    const saved = localStorage.getItem('mediasoft_theme') || 'light';
     document.documentElement.setAttribute('data-theme', saved);
     const btn = document.getElementById('themeToggle');
     if (btn) {
@@ -83,4 +83,5 @@ function updateMsgBadge() {
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
 }
+
 
