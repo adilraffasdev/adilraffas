@@ -26,8 +26,8 @@
                     <h2>Finance</h2>
                 </div>
                 <div class="topbar-actions">
-                    <button class="btn btn-success" onclick="openModal('Revenu')"><i class="fa-solid fa-plus"></i> Add Revenu</button>
-                    <button class="btn btn-danger" onclick="openModal('Dépense')"><i class="fa-solid fa-plus"></i> Add Dépense</button>
+                    <button class="btn btn-success" onclick="openModal('Income')"><i class="fa-solid fa-plus"></i> Ajouter un revenu</button>
+                    <button class="btn btn-danger" onclick="openModal('Expense')"><i class="fa-solid fa-plus"></i> Ajouter une dépense</button>
                 </div>
             </div>
 
@@ -46,8 +46,8 @@
 
             <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
                 <button class="btn btn-sm btn-primary" id="filterAll" onclick="setFilter('all')">All</button>
-                <button class="btn btn-sm btn-success" id="filterIncome" onclick="setFilter('Revenu')">Revenu</button>
-                <button class="btn btn-sm btn-danger" id="filterExpense" onclick="setFilter('Dépense')">Dépense</button>
+                <button class="btn btn-sm btn-success" id="filterIncome" onclick="setFilter('Income')">Revenu</button>
+                <button class="btn btn-sm btn-danger" id="filterExpense" onclick="setFilter('Expense')">Dépense</button>
             </div>
 
             <div class="card">
@@ -211,14 +211,14 @@
                         </td>
                     </tr>
                 `).join('')
-                : '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">No transactions</td></tr>';
+                : '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">Aucune transaction</td></tr>';
         }
 
         function setFilter(type) {
             filterType = type;
-            ['all','Revenu','Dépense'].forEach(t => {
+            ['all','Income','Expense'].forEach(t => {
                 const btn = document.getElementById('filter' + t.charAt(0).toUpperCase() + t.slice(1));
-                if (btn) btn.className = 'btn btn-sm ' + (t === type ? (t === 'Revenu' ? 'btn-success' : t === 'Dépense' ? 'btn-danger' : 'btn-primary') : 'btn-secondary');
+                if (btn) btn.className = 'btn btn-sm ' + (t === type ? (t === 'Income' ? 'btn-success' : t === 'Expense' ? 'btn-danger' : 'btn-primary') : 'btn-secondary');
             });
             renderTable();
         }
@@ -288,6 +288,8 @@
     </script>
 </body>
 </html>
+
+
 
 
 
