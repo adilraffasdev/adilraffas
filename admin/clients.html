@@ -1,11 +1,10 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
-  <script src="js/auth.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="assets/images/logo.png">
-    <title>Clients — Mediasoft Admin</title>
+    <title>Clients — Admin Adil Raffas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/admin.css">
     <style>
@@ -61,7 +60,7 @@
 <body>
     <div class="admin-layout">
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-brand"><img src="assets/images/logo.png" alt="Mediasoft"><span>Mediasoft</span></div>
+            <div class="sidebar-brand"><img src="assets/images/logo.png" alt="Adil Raffas"><span>Adil Raffas</span></div>
             <nav class="sidebar-nav" id="sidebarNav"></nav>
             <div class="sidebar-footer" id="sidebarFooter"></div>
         </aside>
@@ -127,7 +126,7 @@
                         <label>Decision:</label>
                         <select id="filterDecision" onchange="renderTable()">
                             <option value="">All Decisions</option>
-                            <option value="pending">Pending</option>
+                            <option value="pending">En attente</option>
                             <option value="interested">Interested</option>
                             <option value="not_interested">Not Interested</option>
                             <option value="follow_up">Follow Up</option>
@@ -378,7 +377,7 @@
                         </td>
                         <td>
                             <select class="inline-sel" onchange="updateDecision(${c.id}, this.value)">
-                                <option value="pending" ${c.decision === 'pending' ? 'selected' : ''}>Pending</option>
+                                <option value="pending" ${c.decision === 'pending' ? 'selected' : ''}>En attente</option>
                                 <option value="interested" ${c.decision === 'interested' ? 'selected' : ''}>Interested</option>
                                 <option value="not_interested" ${c.decision === 'not_interested' ? 'selected' : ''}>Not Interested</option>
                                 <option value="follow_up" ${c.decision === 'follow_up' ? 'selected' : ''}>Follow Up</option>
@@ -511,8 +510,4 @@
     </script>
 </body>
 </html>
-
-
-
-
 

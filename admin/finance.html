@@ -1,11 +1,10 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
-  <script src="js/auth.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="assets/images/logo.png">
-    <title>Finance — Mediasoft Admin</title>
+    <title>Finance — Admin Adil Raffas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="js/chart.js"></script>
     <link rel="stylesheet" href="css/admin.css">
@@ -14,8 +13,8 @@
     <div class="admin-layout">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <img src="assets/images/logo.png" alt="Mediasoft">
-                <span>Mediasoft</span>
+                <img src="assets/images/logo.png" alt="Adil Raffas">
+                <span>Adil Raffas</span>
             </div>
             <nav class="sidebar-nav" id="sidebarNav"></nav>
             <div class="sidebar-footer" id="sidebarFooter"></div>
@@ -56,9 +55,9 @@
                     <table><thead><tr>
                         <th>Date</th>
                         <th>Type</th>
-                        <th>Category</th>
+                        <th>Catégorie</th>
                         <th>Description</th>
-                        <th style="text-align:right">Amount</th>
+                        <th style="text-align:right">Montant</th>
                         <th style="width:100px">Actions</th>
                     </tr></thead>
                     <tbody id="financeTable"></tbody>
@@ -71,7 +70,7 @@
     <div class="modal-overlay" id="modal">
         <div class="modal" style="max-width:500px;">
             <div class="modal-header">
-                <h3 id="modalTitle">Add Transaction</h3>
+                <h3 id="modalTitle">Ajouter une transaction</h3>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
@@ -79,7 +78,7 @@
                 <input type="hidden" id="fType">
                 <div class="form-group"><label>Description</label><input class="form-control" id="fDesc" required></div>
                 <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                    <div class="form-group"><label>Category</label>
+                    <div class="form-group"><label>Catégorie</label>
                         <select class="form-control" id="fCategory">
                             <option value="Web Development">Web Development</option>
                             <option value="Mobile App">Mobile App</option>
@@ -185,7 +184,7 @@
                     const msg = document.createElement('div');
                     msg.className = 'chart-empty';
                     msg.style.cssText = 'padding:32px;text-align:center;color:var(--text-muted);';
-                    msg.innerHTML = '<i class="fa-solid fa-chart-simple" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.3;"></i>Add transactions to see charts';
+                    msg.innerHTML = '<i class="fa-solid fa-chart-simple" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.3;"></i>Ajouter une transactions to see charts';
                     c.appendChild(msg);
                 });
             }
@@ -289,8 +288,4 @@
     </script>
 </body>
 </html>
-
-
-
-
 

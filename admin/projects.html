@@ -1,11 +1,10 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
-  <script src="js/auth.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="assets/images/logo.png">
-    <title>Projects — Mediasoft Admin</title>
+    <title>Projets — Admin Adil Raffas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/admin.css">
 </head>
@@ -13,8 +12,8 @@
     <div class="admin-layout">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <img src="assets/images/logo.png" alt="Mediasoft">
-                <span>Mediasoft</span>
+                <img src="assets/images/logo.png" alt="Adil Raffas">
+                <span>Adil Raffas</span>
             </div>
             <nav class="sidebar-nav" id="sidebarNav"></nav>
             <div class="sidebar-footer" id="sidebarFooter"></div>
@@ -53,11 +52,11 @@
                 <div class="table-wrap">
                     <table><thead><tr>
                         <th style="width:30px"></th>
-                        <th>Title</th>
+                        <th>Titre</th>
                         <th>Client</th>
-                        <th>Category</th>
+                        <th>Catégorie</th>
                         <th style="width:60px">Featured</th>
-                        <th style="width:60px">Status</th>
+                        <th style="width:60px">Statut</th>
                         <th style="width:160px">Actions</th>
                     </tr></thead>
                     <tbody id="projectsTable"></tbody>
@@ -76,11 +75,11 @@
             <div class="modal-body">
                 <input type="hidden" id="editId">
                 <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                    <div class="form-group"><label>Title</label><input class="form-control" id="fTitle" required></div>
+                    <div class="form-group"><label>Titre</label><input class="form-control" id="fTitle" required></div>
                     <div class="form-group"><label>Client</label><input class="form-control" id="fClient"></div>
                 </div>
                 <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                    <div class="form-group"><label>Category</label>
+                    <div class="form-group"><label>Catégorie</label>
                         <select class="form-control" id="fCategory">
                             <option value="Web Development">Web Development</option>
                             <option value="Mobile App">Mobile App</option>
@@ -239,7 +238,7 @@
             document.getElementById('fImage').value = img;
             const preview = document.getElementById('fImagePreview');
             if (img) { preview.style.display = 'block'; preview.querySelector('img').src = img; } else { preview.style.display = 'none'; }
-            document.getElementById('modalTitle').textContent = data ? 'Edit Project' : 'Add Project';
+            document.getElementById('modalTitle').textContent = data ? 'Modifier le projet' : 'Add Project';
             document.getElementById('modal').classList.add('open');
         }
 
@@ -329,8 +328,4 @@
     </script>
 </body>
 </html>
-
-
-
-
 

@@ -1,11 +1,10 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
-  <script src="js/auth.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="assets/images/logo.png">
-    <title>Settings — Mediasoft Admin</title>
+    <title>Paramètres — Admin Adil Raffas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/admin.css">
 </head>
@@ -13,8 +12,8 @@
     <div class="admin-layout">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <img src="assets/images/logo.png" alt="Mediasoft">
-                <span>Mediasoft</span>
+                <img src="assets/images/logo.png" alt="Adil Raffas">
+                <span>Adil Raffas</span>
             </div>
             <nav class="sidebar-nav" id="sidebarNav"></nav>
             <div class="sidebar-footer" id="sidebarFooter"></div>
@@ -23,10 +22,10 @@
             <div class="topbar">
                 <div style="display:flex;align-items:center;gap:12px;">
                     <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
-                    <h2>Settings</h2>
+                    <h2>Paramètres</h2>
                 </div>
                 <div class="topbar-actions">
-                    <button class="btn btn-primary" onclick="saveSettings()"><i class="fa-solid fa-check"></i> Save Settings</button>
+                    <button class="btn btn-primary" onclick="saveParamètres()"><i class="fa-solid fa-check"></i> Save Paramètres</button>
                 </div>
             </div>
 
@@ -36,8 +35,8 @@
                     <div class="form-group"><label>Company Name</label><input class="form-control" id="fCompanyName"></div>
                     <div class="form-group"><label>Logo Path</label><input class="form-control" id="fLogo" placeholder="assets/images/logo.png"></div>
                     <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                        <div class="form-group"><label>Email</label><input class="form-control" id="fEmail" type="email"></div>
-                        <div class="form-group"><label>Phone</label><input class="form-control" id="fPhone"></div>
+                        <div class="form-group"><label>E-mail</label><input class="form-control" id="fEmail" type="email"></div>
+                        <div class="form-group"><label>Téléphone</label><input class="form-control" id="fPhone"></div>
                     </div>
                     <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                         <div class="form-group"><label>WhatsApp</label><input class="form-control" id="fWhatsapp" placeholder="212708060819"></div>
@@ -82,16 +81,17 @@
 
     <script src="js/layout.js?2"></script>
     <script src="js/db.js?2"></script>
+    <script src="js/auth.config.js"></script>
     <script>
-        initLayout('settings');
+        initLayout('Paramètres');
 
         async function init() {
             await DB.init();
-            loadSettings();
+            loadParamètres();
         }
 
-        function loadSettings() {
-            const s = DB.get('settings');
+        function loadParamètres() {
+            const s = DB.get('Paramètres');
             document.getElementById('fCompanyName').value = s.companyName || '';
             document.getElementById('fLogo').value = s.logo || '';
             document.getElementById('fEmail').value = s.email || '';
@@ -105,7 +105,7 @@
             document.getElementById('fSeoDesc').value = (s.seo && s.seo.description) || '';
         }
 
-        function saveSettings() {
+        function saveParamètres() {
             const data = {
                 companyName: document.getElementById('fCompanyName').value.trim(),
                 logo: document.getElementById('fLogo').value.trim(),
@@ -123,8 +123,8 @@
                     description: document.getElementById('fSeoDesc').value.trim()
                 }
             };
-            DB.set('settings', data);
-            DB.toast('Settings saved');
+            DB.set('Paramètres', data);
+            DB.toast('Paramètres saved');
         }
 
         function changePassword() {
@@ -135,7 +135,7 @@
             if (newPass !== confirmPass) { DB.toast('New passwords do not match', 'error'); return; }
             if (cur !== AUTH_CONFIG.password) { DB.toast('Current password is wrong', 'error'); return; }
             if (newPass.length < 6) { DB.toast('Password must be at least 6 characters', 'error'); return; }
-            localStorage.setItem('mediasoft_auth', JSON.stringify({ username: AUTH_CONFIG.username, password: newPass }));
+            localStorage.setItem('Adil Raffas_auth', JSON.stringify({ username: AUTH_CONFIG.username, password: newPass }));
             document.getElementById('fCurPass').value = '';
             document.getElementById('fNewPass').value = '';
             document.getElementById('fConfirmPass').value = '';
@@ -143,14 +143,14 @@
         }
 
         function exportData() {
-            const stores = ['services', 'packages', 'projects', 'blogs', 'finance', 'settings'];
+            const stores = ['services', 'packages', 'projects', 'blogs', 'finance', 'Paramètres'];
             const exportObj = {};
             stores.forEach(s => exportObj[s] = DB.get(s));
             const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'mediasoft-backup-' + new Date().toISOString().split('T')[0] + '.json';
+            a.download = 'Adil Raffas-backup-' + new Date().toISOString().split('T')[0] + '.json';
             a.click();
             URL.revokeObjectURL(url);
             DB.toast('Data exported');
@@ -163,10 +163,10 @@
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
-            const stores = ['services', 'packages', 'projects', 'blogs', 'testimonials', 'clients', 'finance', 'settings'];
+            const stores = ['services', 'packages', 'projects', 'blogs', 'testimonials', 'clients', 'finance', 'Paramètres'];
                     stores.forEach(s => { if (data[s]) DB.set(s, data[s]); });
                     DB.toast('Data imported successfully');
-                    loadSettings();
+                    loadParamètres();
                 } catch { DB.toast('Invalid JSON file', 'error'); }
             };
             reader.readAsText(file);
@@ -175,24 +175,20 @@
 
         function resetData() {
             if (!confirm('Reset all data to default? This cannot be undone.')) return;
-            if (!confirm('Are you sure?')) return;
-            localStorage.removeItem('mediasoft_services');
-            localStorage.removeItem('mediasoft_packages');
-            localStorage.removeItem('mediasoft_projects');
-            localStorage.removeItem('mediasoft_blogs');
-            localStorage.removeItem('mediasoft_testimonials');
-            localStorage.removeItem('mediasoft_clients');
-            localStorage.removeItem('mediasoft_finance');
-            localStorage.removeItem('mediasoft_settings');
-            DB.init().then(() => { loadSettings(); DB.toast('Data reset to default'); });
+            if (!confirm('Êtes-vous sûr?')) return;
+            localStorage.removeItem('Adil Raffas_services');
+            localStorage.removeItem('Adil Raffas_packages');
+            localStorage.removeItem('Adil Raffas_projects');
+            localStorage.removeItem('Adil Raffas_blogs');
+            localStorage.removeItem('Adil Raffas_testimonials');
+            localStorage.removeItem('Adil Raffas_clients');
+            localStorage.removeItem('Adil Raffas_finance');
+            localStorage.removeItem('Adil Raffas_Paramètres');
+            DB.init().then(() => { loadParamètres(); DB.toast('Data reset to default'); });
         }
 
         init();
     </script>
 </body>
 </html>
-
-
-
-
 

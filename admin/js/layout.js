@@ -35,17 +35,17 @@ function initLayout(page) {
 
     const sidebar = document.getElementById('sidebar');
     document.getElementById('sidebarNav').innerHTML = `
-        <a href="index.html" class="${page === 'dashboard' ? 'active' : ''}"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-        <a href="packages.html" class="${page === 'packages' ? 'active' : ''}"><i class="fa-solid fa-tag"></i> Packages</a>
-        <a href="projects.html" class="${page === 'projects' ? 'active' : ''}"><i class="fa-solid fa-briefcase"></i> Projects</a>
+        <a href="index.html" class="${page === 'dashboard' ? 'active' : ''}"><i class="fa-solid fa-chart-pie"></i> Tableau de bord</a>
+        <a href="packages.html" class="${page === 'packages' ? 'active' : ''}"><i class="fa-solid fa-tag"></i> Forfaits</a>
+        <a href="projects.html" class="${page === 'projects' ? 'active' : ''}"><i class="fa-solid fa-briefcase"></i> Projets</a>
         <a href="clients.html" class="${page === 'clients' ? 'active' : ''}"><i class="fa-solid fa-address-book"></i> Clients</a>
         <a href="messages.html" class="${page === 'messages' ? 'active' : ''}"><i class="fa-solid fa-envelope"></i> Messages <span id="msgBadge" class="badge-msg" style="display:none;margin-left:auto;background:var(--danger);color:#fff;font-size:11px;padding:1px 7px;border-radius:10px;font-weight:700;"></span></a>
         <a href="finance.html" class="${page === 'finance' ? 'active' : ''}"><i class="fa-solid fa-coins"></i> Finance</a>
-        <a href="settings.html" class="${page === 'settings' ? 'active' : ''}"><i class="fa-solid fa-gear"></i> Settings</a>
+        <a href="settings.html" class="${page === 'settings' ? 'active' : ''}"><i class="fa-solid fa-gear"></i> Paramètres</a>
     `;
 
     document.getElementById('sidebarFooter').innerHTML = `
-        <a href="#" onclick="logout()" style="color:var(--danger);"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        <a href="#" onclick="logout()" style="color:var(--danger);"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
     `;
 
     const userEl = document.getElementById('userDisplay');
@@ -79,6 +79,7 @@ function updateMsgBadge() {
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
 }
+
 
 
 

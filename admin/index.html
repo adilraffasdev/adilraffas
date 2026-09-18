@@ -1,11 +1,10 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
-  <script src="js/auth.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="assets/images/logo.png">
-    <title>Dashboard — Mediasoft Admin</title>
+    <title>Tableau de bord — Admin Adil Raffas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="js/chart.js"></script>
     <link rel="stylesheet" href="css/admin.css">
@@ -14,8 +13,8 @@
     <div class="admin-layout">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <img src="assets/images/logo.png" alt="Mediasoft">
-                <span>Mediasoft</span>
+                <img src="assets/images/logo.png" alt="Adil Raffas">
+                <span>Adil Raffas</span>
             </div>
             <nav class="sidebar-nav" id="sidebarNav"></nav>
             <div class="sidebar-footer" id="sidebarFooter"></div>
@@ -24,7 +23,7 @@
             <div class="topbar">
                 <div style="display:flex;align-items:center;gap:12px;">
                     <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
-                    <h2>Dashboard</h2>
+                    <h2>Tableau de bord</h2>
                 </div>
                 <div class="topbar-actions">
                     <span style="color:var(--text-muted);font-size:0.85rem;" id="userDisplay"></span>
@@ -57,7 +56,7 @@
                         <a href="packages.html" class="btn btn-secondary" style="justify-content:center;"><i class="fa-solid fa-plus"></i> Add Package</a>
                         <a href="projects.html" class="btn btn-secondary" style="justify-content:center;"><i class="fa-solid fa-plus"></i> Add Project</a>
                         <a href="blogs.html" class="btn btn-secondary" style="justify-content:center;"><i class="fa-solid fa-plus"></i> Add Blog Post</a>
-                        <a href="finance.html" class="btn btn-secondary" style="justify-content:center;"><i class="fa-solid fa-plus"></i> Add Transaction</a>
+                        <a href="finance.html" class="btn btn-secondary" style="justify-content:center;"><i class="fa-solid fa-plus"></i> Ajouter une transaction</a>
                         <a href="../index.html" class="btn btn-secondary" style="justify-content:center;" target="_blank"><i class="fa-solid fa-eye"></i> View Site</a>
                     </div>
                 </div>
@@ -67,7 +66,7 @@
     <script src="js/layout.js?2"></script>
     <script src="js/db.js?2"></script>
     <script>
-        initLayout('dashboard');
+        initLayout('Tableau de bord');
 
         async function init() {
             await DB.init();
@@ -141,7 +140,7 @@
                 const msg = document.createElement('div');
                 msg.className = 'chart-empty';
                 msg.style.cssText = 'padding:32px;text-align:center;color:var(--text-muted);';
-                msg.innerHTML = '<i class="fa-solid fa-chart-pie" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.3;"></i>Add transactions to see profit by category';
+                msg.innerHTML = '<i class="fa-solid fa-chart-pie" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.3;"></i>Ajouter une transactions to see profit by category';
                 document.querySelector('.charts-grid .card:first-child').appendChild(msg);
             }
 
@@ -165,7 +164,7 @@
                 const msg = document.createElement('div');
                 msg.className = 'chart-empty';
                 msg.style.cssText = 'padding:32px;text-align:center;color:var(--text-muted);';
-                msg.innerHTML = '<i class="fa-solid fa-chart-line" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.3;"></i>Add transactions to see monthly profit';
+                msg.innerHTML = '<i class="fa-solid fa-chart-line" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.3;"></i>Ajouter une transactions to see monthly profit';
                 document.querySelector('.charts-grid .card:nth-child(2)').appendChild(msg);
             }
 
@@ -182,8 +181,4 @@
     </script>
 </body>
 </html>
-
-
-
-
 

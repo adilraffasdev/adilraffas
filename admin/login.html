@@ -1,100 +1,58 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="assets/images/logo.png">
-  <title>Admin Login — Adil Raffas</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="css/admin.css">
-  <script>
-    // If already logged in, go directly to dashboard
-    (function(){
-      var m = document.cookie.match('(^|;)\\s*ar_auth\\s*=\\s*([^;]+)');
-      if (m && m[2] === '1') window.location.replace('/admin/index.html');
-    })();
-  </script>
-  <style>
-    .login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%)}
-    .login-card{background:var(--bg-card);border-radius:16px;padding:40px;width:100%;max-width:400px;border:1px solid var(--border);box-shadow:0 25px 50px -12px rgba(0,0,0,.5);text-align:center}
-    .login-card img{height:52px;margin-bottom:16px}
-    .login-card h1{font-size:1.4rem;font-weight:700;margin-bottom:6px}
-    .login-card p.sub{color:var(--text-muted);font-size:.85rem;margin-bottom:28px}
-    .form-group{margin-bottom:16px;text-align:left}
-    .form-group label{display:block;font-size:.82rem;font-weight:600;color:var(--text-muted);margin-bottom:6px}
-    .form-control{width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:.9rem;transition:border-color .2s}
-    .form-control:focus{outline:none;border-color:#005CD8}
-    .btn-login{display:flex;align-items:center;justify-content:center;gap:10px;background:#005CD8;color:#fff;border:none;padding:12px;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;margin-top:8px;transition:background .2s}
-    .btn-login:hover{background:#0045a0}
-    .btn-login:disabled{opacity:.6;cursor:not-allowed}
-    .error-msg{color:#ef4444;font-size:.83rem;margin-top:10px;display:none;text-align:left}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/images/logo.png">
+    <title>Admin Login — Adil Raffas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body class="login-page">
-  <div class="login-card">
-    <img src="assets/images/logo.png" alt="Admin">
-    <h1>Admin Panel</h1>
-    <p class="sub">Sign in to manage your website</p>
-    <form id="loginForm" autocomplete="off">
-      <div class="form-group">
-        <label for="pwd">Password</label>
-        <input type="password" class="form-control" id="pwd" placeholder="Enter your password" required autofocus>
-      </div>
-      <p class="error-msg" id="errMsg"><i class="fa-solid fa-circle-xmark"></i> Wrong password. Try again.</p>
-      <button type="submit" class="btn-login" id="loginBtn">
-        <i class="fa-solid fa-right-to-bracket"></i> Sign In
-      </button>
-    </form>
-  </div>
+    <div class="login-card">
+        <div class="logo">
+            <img src="assets/images/logo.png" alt="Adil Raffas">
+            <h1>Admin Panel</h1>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Connectez-vous pour gérer votre site</p>
+        </div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" class="form-control" id="username" required autocomplete="username" autofocus>
+            </div>
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" class="form-control" id="password" required autocomplete="current-password">
+            </div>
+            <p id="loginError" style="color: var(--danger); font-size: 0.85rem; margin-bottom: 12px; display: none;">Invalid credentials</p>
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;">
+                <i class="fa-solid fa-right-to-bracket"></i> Sign In
+            </button>
+        </form>
+    </div>
+    <script src="js/auth.config.js"></script>
+    <script>
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        usernameInput.value = AUTH_CONFIG.username;
+        passwordInput.value = AUTH_CONFIG.password;
 
-  <script>
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      var pass = document.getElementById('pwd').value.trim();
-      var btn  = document.getElementById('loginBtn');
-      var err  = document.getElementById('errMsg');
-      err.style.display = 'none';
-
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
-
-      // Hash password with SHA-256
-      var enc = new TextEncoder();
-      crypto.subtle.digest('SHA-256', enc.encode(pass)).then(function(buf) {
-        var hash = Array.from(new Uint8Array(buf))
-                       .map(function(b){ return b.toString(16).padStart(2,'0'); })
-                       .join('');
-
-        fetch('/.netlify/functions/auth-check', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ hash: hash })
-        })
-        .then(function(r){ return r.json(); })
-        .then(function(res){
-          if (res.ok) {
-            // Set cookie — expires in 24 hours
-            var exp = new Date(Date.now() + 86400000).toUTCString();
-            document.cookie = 'ar_auth=1;expires=' + exp + ';path=/;SameSite=Strict';
-            // Redirect after cookie is set
-            window.location.href = '/admin/index.html';
-          } else {
-            err.style.display = 'block';
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
-            document.getElementById('pwd').value = '';
-            document.getElementById('pwd').focus();
-          }
-        })
-        .catch(function(){
-          err.textContent = 'Connection error. Try again.';
-          err.style.display = 'block';
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = usernameInput.value.trim();
+            const pass = passwordInput.value.trim();
+            const error = document.getElementById('loginError');
+            if (user === AUTH_CONFIG.username && pass === AUTH_CONFIG.password) {
+                localStorage.setItem('Adil Raffas_admin', JSON.stringify({ user, loggedIn: true, time: Date.now() }));
+                window.location.href = 'index.html';
+            } else {
+                error.style.display = 'block';
+            }
         });
-      });
-    });
-  </script>
+        if (localStorage.getItem('Adil Raffas_admin')) {
+            window.location.href = 'index.html';
+        }
+    </script>
 </body>
 </html>
 

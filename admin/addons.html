@@ -1,11 +1,10 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
-  <script src="js/auth.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="assets/images/logo.png">
-    <title>Add-ons — Mediasoft Admin</title>
+    <title>Modules — Admin Adil Raffas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/admin.css">
 </head>
@@ -13,8 +12,8 @@
     <div class="admin-layout">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <img src="assets/images/logo.png" alt="Mediasoft">
-                <span>Mediasoft</span>
+                <img src="assets/images/logo.png" alt="Adil Raffas">
+                <span>Adil Raffas</span>
             </div>
             <nav class="sidebar-nav" id="sidebarNav"></nav>
             <div class="sidebar-footer" id="sidebarFooter"></div>
@@ -41,10 +40,10 @@
                 <div class="table-wrap">
                     <table><thead><tr>
                         <th style="width:30px"></th>
-                        <th>Title</th>
-                        <th>Price</th>
+                        <th>Titre</th>
+                        <th>Prix</th>
                         <th>Period</th>
-                        <th style="width:70px">Status</th>
+                        <th style="width:70px">Statut</th>
                         <th style="width:160px">Actions</th>
                     </tr></thead>
                     <tbody id="addonsTable"></tbody>
@@ -63,9 +62,9 @@
             <div class="modal-body">
                 <input type="hidden" id="editId">
                 <div class="form-row" style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;">
-                    <div class="form-group"><label>Title</label><input class="form-control" id="fTitle" required></div>
-                    <div class="form-group"><label>Price</label><input class="form-control" id="fPrice" type="number" required></div>
-                    <div class="form-group"><label>Currency</label><input class="form-control" id="fCurrency" value="MAD"></div>
+                    <div class="form-group"><label>Titre</label><input class="form-control" id="fTitle" required></div>
+                    <div class="form-group"><label>Prix</label><input class="form-control" id="fPrice" type="number" required></div>
+                    <div class="form-group"><label>Devise</label><input class="form-control" id="fCurrency" value="MAD"></div>
                 </div>
                 <div class="form-group"><label>Period (e.g. /mo, /year, or leave empty)</label><input class="form-control" id="fPeriod" placeholder="/mo"></div>
                 <div class="form-group"><label>Description</label><input class="form-control" id="fDesc" placeholder="Short description"></div>
@@ -185,8 +184,4 @@
     </script>
 </body>
 </html>
-
-
-
-
 

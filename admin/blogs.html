@@ -1,11 +1,10 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
-  <script src="js/auth.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="assets/images/logo.png">
-    <title>Blog — Mediasoft Admin</title>
+    <title>Blog — Admin Adil Raffas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/admin.css">
 </head>
@@ -13,8 +12,8 @@
     <div class="admin-layout">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <img src="assets/images/logo.png" alt="Mediasoft">
-                <span>Mediasoft</span>
+                <img src="assets/images/logo.png" alt="Adil Raffas">
+                <span>Adil Raffas</span>
             </div>
             <nav class="sidebar-nav" id="sidebarNav"></nav>
             <div class="sidebar-footer" id="sidebarFooter"></div>
@@ -44,11 +43,11 @@
             <div class="card">
                 <div class="table-wrap">
                     <table><thead><tr>
-                        <th>Title</th>
-                        <th>Category</th>
+                        <th>Titre</th>
+                        <th>Catégorie</th>
                         <th>Author</th>
                         <th>Date</th>
-                        <th style="width:80px">Status</th>
+                        <th style="width:80px">Statut</th>
                         <th style="width:120px">Actions</th>
                     </tr></thead>
                     <tbody id="blogsTable"></tbody>
@@ -67,8 +66,8 @@
             <div class="modal-body">
                 <input type="hidden" id="editId">
                 <div class="form-row" style="display:grid;grid-template-columns:2fr 1fr;gap:12px;">
-                    <div class="form-group"><label>Title</label><input class="form-control" id="fTitle" required></div>
-                    <div class="form-group"><label>Category</label>
+                    <div class="form-group"><label>Titre</label><input class="form-control" id="fTitle" required></div>
+                    <div class="form-group"><label>Catégorie</label>
                         <select class="form-control" id="fCategory">
                             <option value="Web Development">Web Development</option>
                             <option value="Branding">Branding</option>
@@ -89,7 +88,7 @@
                 <div class="form-group"><label>Excerpt</label><textarea class="form-control" id="fExcerpt" rows="2"></textarea></div>
                 <div class="form-group"><label>Content (HTML)</label><textarea class="form-control rich-editor" id="fContent" rows="10"></textarea></div>
                 <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
-                    <div class="form-group"><label>Author</label><input class="form-control" id="fAuthor" value="Mediasoft"></div>
+                    <div class="form-group"><label>Author</label><input class="form-control" id="fAuthor" value="Adil Raffas"></div>
                     <div class="form-group"><label>Reading Time</label><input class="form-control" id="fReadingTime" placeholder="5 min"></div>
                     <div class="form-group"><label>SEO Title</label><input class="form-control" id="fSeoTitle"></div>
                 </div>
@@ -162,7 +161,7 @@
                 <tr>
                     <td><strong>${b.title}</strong><br><small style="color:var(--text-muted);">${(b.excerpt || '').substring(0, 60)}</small></td>
                     <td><span class="badge badge-info">${b.category || '-'}</span></td>
-                    <td>${b.author || 'Mediasoft'}</td>
+                    <td>${b.author || 'Adil Raffas'}</td>
                     <td style="font-size:0.85rem;color:var(--text-muted);">${b.publishDate || '-'}</td>
                     <td>${b.status === 'published' ? '<span class="badge badge-success">Published</span>' : '<span class="badge badge-warning">Draft</span>'}</td>
                     <td>
@@ -186,7 +185,7 @@
             if (img) { preview.style.display = 'block'; preview.querySelector('img').src = img; } else { preview.style.display = 'none'; }
             document.getElementById('fExcerpt').value = data ? data.excerpt : '';
             document.getElementById('fContent').value = data ? data.content : '';
-            document.getElementById('fAuthor').value = data ? data.author : 'Mediasoft';
+            document.getElementById('fAuthor').value = data ? data.author : 'Adil Raffas';
             document.getElementById('fReadingTime').value = data ? data.readingTime : '';
             document.getElementById('fSeoTitle').value = data ? data.seoTitle : '';
             document.getElementById('modalTitle').textContent = data ? 'Edit Blog Post' : 'Add Blog Post';
@@ -235,7 +234,7 @@
                 featuredImage: document.getElementById('fImage').value.trim(),
                 content: document.getElementById('fContent').value,
                 excerpt: document.getElementById('fExcerpt').value.trim(),
-                author: document.getElementById('fAuthor').value.trim() || 'Mediasoft',
+                author: document.getElementById('fAuthor').value.trim() || 'Adil Raffas',
                 publishDate: new Date().toISOString().split('T')[0],
                 readingTime: document.getElementById('fReadingTime').value.trim() || Math.ceil(document.getElementById('fContent').value.split(' ').length / 200) + ' min',
                 seoTitle: document.getElementById('fSeoTitle').value.trim(),
@@ -304,8 +303,4 @@
     </script>
 </body>
 </html>
-
-
-
-
 
