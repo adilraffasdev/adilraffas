@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -67,10 +67,10 @@
                     <div class="form-group"><label>Devise</label><input class="form-control" id="fCurrency" value="MAD"></div>
                 </div>
                 <div class="form-group"><label>Period (e.g. /mo, /year, or leave empty)</label><input class="form-control" id="fPeriod" placeholder="/mo"></div>
-                <div class="form-group"><label>Description</label><input class="form-control" id="fDesc" placeholder="Short description"></div>
+                <div class="form-group"><label>Description</label><input class="form-control" id="fDesc" placeholder="Courte description"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
                 <button class="btn btn-primary" onclick="saveAddon()"><i class="fa-solid fa-check"></i> Save</button>
             </div>
         </div>
@@ -99,7 +99,7 @@
                 <tr draggable="true" data-id="${a.id}">
                     <td class="drag-handle"><i class="fa-solid fa-grip-vertical"></i></td>
                     <td><strong>${a.title}</strong></td>
-                    <td>${a.price ? a.price.toLocaleString() + ' ' + (a.currency || 'MAD') : '-'}</td>
+                    <td>${a.price ? a.price.toLocaleString() + ' ' + (a.Devise || 'MAD') : '-'}</td>
                     <td>${a.period || '-'}</td>
                     <td><label class="toggle"><input type="checkbox" ${a.status === 'visible' ? 'checked' : ''} onchange="toggleStatus(${a.id})"><span class="toggle-slider"></span></label></td>
                     <td>
@@ -115,7 +115,7 @@
             document.getElementById('editId').value = data ? data.id : '';
             document.getElementById('fTitle').value = data ? data.title : '';
             document.getElementById('fPrice').value = data ? data.price : '';
-            document.getElementById('fCurrency').value = data ? data.currency : 'MAD';
+            document.getElementById('fCurrency').value = data ? data.Devise : 'MAD';
             document.getElementById('fPeriod').value = data ? data.period : '';
             document.getElementById('fDesc').value = data ? data.description : '';
             document.getElementById('modalTitle').textContent = data ? 'Edit Add-on' : 'Add Add-on';
@@ -132,12 +132,12 @@
             const data = {
                 title: document.getElementById('fTitle').value.trim(),
                 price: parseFloat(document.getElementById('fPrice').value) || 0,
-                currency: document.getElementById('fCurrency').value.trim() || 'MAD',
+                Devise: document.getElementById('fCurrency').value.trim() || 'MAD',
                 period: document.getElementById('fPeriod').value.trim(),
                 description: document.getElementById('fDesc').value.trim(),
                 status: 'visible'
             };
-            if (!data.title) { DB.toast('Title is required', 'error'); return; }
+            if (!data.title) { DB.toast('Le titre est obligatoire', 'error'); return; }
             if (id) {
                 DB.update('addons', parseInt(id), data);
                 DB.toast('Add-on updated');
@@ -166,7 +166,7 @@
         }
 
         function deleteAddon(id) {
-            if (!confirm('Delete this add-on?')) return;
+            if (!confirm('Supprimer add-on?')) return;
             DB.delete('addons', id);
             DB.toast('Add-on deleted');
             renderTable();
@@ -184,4 +184,5 @@
     </script>
 </body>
 </html>
+
 

@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,7 +39,7 @@
                     <div class="chart-container" id="categoryChartContainer"><canvas id="categoryChart-canvas"></canvas></div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><h3>Monthly Profit</h3></div>
+                    <div class="card-header"><h3>Mensuel Profit</h3></div>
                     <div class="chart-container" id="profitChartContainer"><canvas id="profitChart-canvas"></canvas></div>
                 </div>
             </div>
@@ -50,11 +50,11 @@
                     <div id="recentActivity" style="font-size:0.85rem;color:var(--text-muted);"></div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><h3>Quick Actions</h3></div>
+                    <div class="card-header"><h3>Actions rapides</h3></div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                         <a href="services.html" class="btn btn-secondary" style="justify-content:center;"><i class="fa-solid fa-plus"></i> Add Service</a>
-                        <a href="packages.html" class="btn btn-secondary" style="justify-content:center;"><i class="fa-solid fa-plus"></i> Add Package</a>
-                        <a href="projects.html" class="btn btn-secondary" style="justify-content:center;"><i class="fa-solid fa-plus"></i> Add Project</a>
+                        <a href="packages.html" class="btn btn-secondary" style="justify-content:center;"><i class="fa-solid fa-plus"></i> Ajouter un forfait</a>
+                        <a href="projects.html" class="btn btn-secondary" style="justify-content:center;"><i class="fa-solid fa-plus"></i> Ajouter un projet</a>
                         <a href="blogs.html" class="btn btn-secondary" style="justify-content:center;"><i class="fa-solid fa-plus"></i> Add Blog Post</a>
                         <a href="finance.html" class="btn btn-secondary" style="justify-content:center;"><i class="fa-solid fa-plus"></i> Ajouter une transaction</a>
                         <a href="../index.html" class="btn btn-secondary" style="justify-content:center;" target="_blank"><i class="fa-solid fa-eye"></i> View Site</a>
@@ -78,8 +78,8 @@
             const finance = DB.get('finance');
             const transactions = finance.transactions || [];
 
-            const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-            const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+            const totalIncome = transactions.filter(t => t.type === 'Revenu').reduce((s, t) => s + t.amount, 0);
+            const totalExpenses = transactions.filter(t => t.type === 'Dépense').reduce((s, t) => s + t.amount, 0);
             const netProfit = totalIncome - totalExpenses;
 
             document.getElementById('statsGrid').innerHTML = `
@@ -90,32 +90,32 @@
                 <div class="stat-card"><div class="stat-icon" style="background:rgba(251,191,36,0.15);color:var(--warning);"><i class="fa-solid fa-star"></i></div><div class="stat-info"><h4>Testimonials</h4><div class="value">${testimonials.length}</div></div></div>
             `;
             document.getElementById('financeStats').innerHTML = `
-                <div class="stat-card"><div class="stat-icon" style="background:rgba(3,150,250,0.15);color:var(--secondary);"><i class="fa-solid fa-arrow-down"></i></div><div class="stat-info"><h4>Total Income</h4><div class="value">${totalIncome.toLocaleString()} MAD</div></div></div>
-                <div class="stat-card"><div class="stat-icon" style="background:rgba(239,68,68,0.15);color:var(--danger);"><i class="fa-solid fa-arrow-up"></i></div><div class="stat-info"><h4>Total Expenses</h4><div class="value">${totalExpenses.toLocaleString()} MAD</div></div></div>
-                <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:var(--success);"><i class="fa-solid fa-coins"></i></div><div class="stat-info"><h4>Net Profit</h4><div class="value">${netProfit.toLocaleString()} MAD</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(3,150,250,0.15);color:var(--secondary);"><i class="fa-solid fa-arrow-down"></i></div><div class="stat-info"><h4>Total Revenu</h4><div class="value">${totalIncome.toLocaleString()} MAD</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(239,68,68,0.15);color:var(--danger);"><i class="fa-solid fa-arrow-up"></i></div><div class="stat-info"><h4>Dépenses totales</h4><div class="value">${totalExpenses.toLocaleString()} MAD</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:var(--success);"><i class="fa-solid fa-coins"></i></div><div class="stat-info"><h4>Bénéfice net</h4><div class="value">${netProfit.toLocaleString()} MAD</div></div></div>
             `;
 
-            // Monthly grouping
+            // Mensuel grouping
             const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
             const monthData = {};
             transactions.forEach(t => {
                 const m = t.date.substring(0, 7);
-                if (!monthData[m]) monthData[m] = { income: 0, expense: 0 };
-                if (t.type === 'income') monthData[m].income += t.amount;
-                else monthData[m].expense += t.amount;
+                if (!monthData[m]) monthData[m] = { Revenu: 0, Dépense: 0 };
+                if (t.type === 'Revenu') monthData[m].Revenu += t.amount;
+                else monthData[m].Dépense += t.amount;
             });
             const labels = Object.keys(monthData).sort();
-            const incomeData = labels.map(m => monthData[m].income);
-            const expenseData = labels.map(m => monthData[m].expense);
-            const profitData = labels.map(m => monthData[m].income - monthData[m].expense);
+            const incomeData = labels.map(m => monthData[m].Revenu);
+            const expenseData = labels.map(m => monthData[m].Dépense);
+            const profitData = labels.map(m => monthData[m].Revenu - monthData[m].Dépense);
 
             // Profit by category
             const catMap = {};
             transactions.forEach(t => {
                 const cat = t.category || 'Other';
-                if (!catMap[cat]) catMap[cat] = { income: 0, expense: 0 };
-                if (t.type === 'income') catMap[cat].income += t.amount;
-                else catMap[cat].expense += t.amount;
+                if (!catMap[cat]) catMap[cat] = { Revenu: 0, Dépense: 0 };
+                if (t.type === 'Revenu') catMap[cat].Revenu += t.amount;
+                else catMap[cat].Dépense += t.amount;
             });
             const catLabels = Object.keys(catMap).sort();
             const catColors = ['#0396FA','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#14b8a6','#f97316','#6366f1','#84cc16'];
@@ -125,7 +125,7 @@
                 document.getElementById('categoryChartContainer').style.display = 'block';
                 document.getElementById('categoryChartContainer').innerHTML = '<canvas id="categoryChart-canvas"></canvas>';
                 document.querySelectorAll('.charts-grid .card .chart-empty').forEach(c => c.remove());
-                const catProfit = catLabels.map(c => catMap[c].income - catMap[c].expense);
+                const catProfit = catLabels.map(c => catMap[c].Revenu - catMap[c].Dépense);
                 new Chart(document.getElementById('categoryChart-canvas'), {
                     type: 'doughnut',
                     data: { labels: catLabels, datasets: [{ data: catProfit.map(v => Math.abs(v)), backgroundColor: catBg }] },
@@ -164,7 +164,7 @@
                 const msg = document.createElement('div');
                 msg.className = 'chart-empty';
                 msg.style.cssText = 'padding:32px;text-align:center;color:var(--text-muted);';
-                msg.innerHTML = '<i class="fa-solid fa-chart-line" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.3;"></i>Ajouter une transactions to see monthly profit';
+                msg.innerHTML = '<i class="fa-solid fa-chart-line" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.3;"></i>Ajouter une transactions to see Mensuel profit';
                 document.querySelector('.charts-grid .card:nth-child(2)').appendChild(msg);
             }
 
@@ -173,7 +173,7 @@
             document.getElementById('recentActivity').innerHTML = recent.length
                 ? recent.map(t => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
                     <span>${t.description}</span>
-                    <span style="color:${t.type === 'income' ? 'var(--success)' : 'var(--danger)'};">${t.type === 'income' ? '+' : '-'}${t.amount.toLocaleString()} MAD</span>
+                    <span style="color:${t.type === 'Revenu' ? 'var(--success)' : 'var(--danger)'};">${t.type === 'Revenu' ? '+' : '-'}${t.amount.toLocaleString()} MAD</span>
                 </div>`).join('')
                 : '<p style="padding:16px;text-align:center;">No transactions yet</p>';
         }
@@ -181,4 +181,5 @@
     </script>
 </body>
 </html>
+
 

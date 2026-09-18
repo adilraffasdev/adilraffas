@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,29 +22,29 @@
             <div class="topbar">
                 <div style="display:flex;align-items:center;gap:12px;">
                     <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
-                    <h2>Projects / Portfolio</h2>
+                    <h2>Projets / Portfolio</h2>
                 </div>
                 <div class="topbar-actions">
-                    <button class="btn btn-secondary" onclick="document.getElementById('importFileInput').click()" title="Import projects from JSON file"><i class="fa-solid fa-upload"></i> Import JSON</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('importFileInput').click()" title="Import projects De JSON file"><i class="fa-solid fa-upload"></i> Importer JSON</button>
                     <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importProjectsFromFile(this)">
-                    <button class="btn btn-secondary" onclick="importProjects()" title="Reset to default projects"><i class="fa-solid fa-rotate"></i> Reset Data</button>
-                    <button class="btn btn-secondary" onclick="exportProjectsData()" title="Export all projects as JSON"><i class="fa-solid fa-download"></i> Export Data</button>
-                    <button class="btn btn-primary" onclick="addProject()"><i class="fa-solid fa-plus"></i> Add Project</button>
+                    <button class="btn btn-secondary" onclick="importProjects()" title="Reset to default projects"><i class="fa-solid fa-rotate"></i> Réinitialiser</button>
+                    <button class="btn btn-secondary" onclick="exportProjectsData()" title="Export all projects as JSON"><i class="fa-solid fa-download"></i> Exporter</button>
+                    <button class="btn btn-primary" onclick="addProject()"><i class="fa-solid fa-plus"></i> Ajouter un projet</button>
                 </div>
             </div>
 
             <div class="toolbar">
                 <div class="search-box">
                     <i class="fa-solid fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Search projects..." oninput="renderTable()">
+                    <input type="text" id="searchInput" placeholder="Rechercher des projets..." oninput="renderTable()">
                 </div>
                 <select class="form-control" id="filterCategory" style="width:auto;" onchange="renderTable()">
-                    <option value="">All Categories</option>
-                    <option value="Web Development">Web Development</option>
-                    <option value="Mobile App">Mobile App</option>
-                    <option value="Desktop App">Desktop App</option>
+                    <option value="">Toutes les catégories</option>
+                    <option value="Développement Web">Développement Web</option>
+                    <option value="Application Mobile">Application Mobile</option>
+                    <option value="Application Bureau">Application Bureau</option>
                     <option value="Branding">Branding</option>
-                    <option value="Digital Marketing">Digital Marketing</option>
+                    <option value="Marketing Digital">Marketing Digital</option>
                 </select>
             </div>
 
@@ -69,7 +69,7 @@
     <div class="modal-overlay" id="modal">
         <div class="modal" style="max-width:750px;">
             <div class="modal-header">
-                <h3 id="modalTitle">Add Project</h3>
+                <h3 id="modalTitle">Ajouter un projet</h3>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
@@ -81,40 +81,40 @@
                 <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="form-group"><label>Catégorie</label>
                         <select class="form-control" id="fCategory">
-                            <option value="Web Development">Web Development</option>
-                            <option value="Mobile App">Mobile App</option>
-                            <option value="Desktop App">Desktop App</option>
+                            <option value="Développement Web">Développement Web</option>
+                            <option value="Application Mobile">Application Mobile</option>
+                            <option value="Application Bureau">Application Bureau</option>
                             <option value="Branding">Branding</option>
-                            <option value="Digital Marketing">Digital Marketing</option>
+                            <option value="Marketing Digital">Marketing Digital</option>
                         </select>
                     </div>
-                    <div class="form-group"><label>Completion Date</label><input class="form-control" id="fDate" type="date"></div>
+                    <div class="form-group"><label>Date de livraison</label><input class="form-control" id="fDate" type="date"></div>
                 </div>
-                <div class="form-group"><label>Short Description</label><textarea class="form-control" id="fShortDesc" rows="2"></textarea></div>
-                <div class="form-group"><label>Full Description</label><textarea class="form-control" id="fFullDesc" rows="4"></textarea></div>
+                <div class="form-group"><label>Courte description</label><textarea class="form-control" id="fShortDesc" rows="2"></textarea></div>
+                <div class="form-group"><label>Description complète</label><textarea class="form-control" id="fFullDesc" rows="4"></textarea></div>
                 <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                    <div class="form-group"><label>Technologies (comma separated)</label><input class="form-control" id="fTech" placeholder="React, Node.js"></div>
-                    <div class="form-group"><label>Website URL</label><input class="form-control" id="fUrl" placeholder="https://"></div>
+                    <div class="form-group"><label>Technologies (séparées par virgule)</label><input class="form-control" id="fTech" placeholder="React, Node.js"></div>
+                    <div class="form-group"><label>URL du site</label><input class="form-control" id="fUrl" placeholder="https://"></div>
                 </div>
                 <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                    <div class="form-group"><label>Featured Image</label>
+                    <div class="form-group"><label>Image principale</label>
                         <input class="form-control" id="fImage" placeholder="URL or upload below">
-                        <div style="margin-top:6px;display:flex;align-items:center;gap:8px;"><label for="fImageUpload" style="font-size:0.8rem;cursor:pointer;color:var(--secondary);"><i class="fa-solid fa-upload"></i> Upload file</label><input type="file" id="fImageUpload" accept="image/*" style="display:none;" onchange="handleImageUpload(this)"></div>
+                        <div style="margin-top:6px;display:flex;align-items:center;gap:8px;"><label for="fImageUpload" style="font-size:0.8rem;cursor:pointer;color:var(--secondary);"><i class="fa-solid fa-upload"></i> Télécharger un fichier</label><input type="file" id="fImageUpload" accept="image/*" style="display:none;" onchange="handleImageUpload(this)"></div>
                         <div id="fImagePreview" style="display:none;margin-top:8px;"><img style="max-width:150px;border-radius:6px;border:1px solid var(--border);"></div>
                     </div>
                     <div class="form-group"><label>Slug</label><input class="form-control" id="fSlug" placeholder="project-slug"></div>
                 </div>
                 <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                    <div class="form-group"><label>SEO Title</label><input class="form-control" id="fSeoTitle"></div>
+                    <div class="form-group"><label>Titre SEO</label><input class="form-control" id="fSeoTitle"></div>
                 </div>
                 <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <label style="display:flex;align-items:center;gap:8px;">
-                        <input type="checkbox" id="fFeatured"> Featured project
+                        <input type="checkbox" id="fFeatured"> Projet en vedette
                     </label>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
                 <button class="btn btn-primary" onclick="saveProject()"><i class="fa-solid fa-check"></i> Save</button>
             </div>
         </div>
@@ -147,9 +147,9 @@
                     if (!confirm('Import ' + data.length + ' projects? This will overwrite current data.')) return;
                     DB.set('projects', data);
                     renderTable();
-                    DB.toast(data.length + ' projects imported');
+                    DB.toast(data.length + ' projets importés');
                 } catch (err) {
-                    DB.toast('Invalid JSON file: ' + err.message, 'error');
+                    DB.toast('Fichier JSON invalide: ' + err.message, 'error');
                 }
             };
             reader.readAsText(file);
@@ -164,7 +164,7 @@
             if (!confirm('Reset all projects to default data? This will overwrite your changes.')) return;
             DB.set('projects', PROJECTS_DEFAULT);
             renderTable();
-            DB.toast('Reset to ' + PROJECTS_DEFAULT.length + ' projects');
+            DB.toast('Réinitialisé à ' + PROJECTS_DEFAULT.length + ' projets');
         }
 
         function getData() {
@@ -225,7 +225,7 @@
             document.getElementById('editId').value = data ? data.id : '';
             document.getElementById('fTitle').value = data ? data.title : '';
             document.getElementById('fClient').value = data ? data.client : '';
-            document.getElementById('fCategory').value = data ? data.category : 'Web Development';
+            document.getElementById('fCategory').value = data ? data.category : 'Développement Web';
             document.getElementById('fDate').value = data ? data.completionDate : '';
             document.getElementById('fShortDesc').value = data ? data.shortDescription : '';
             document.getElementById('fFullDesc').value = data ? data.fullDescription : '';
@@ -238,7 +238,7 @@
             document.getElementById('fImage').value = img;
             const preview = document.getElementById('fImagePreview');
             if (img) { preview.style.display = 'block'; preview.querySelector('img').src = img; } else { preview.style.display = 'none'; }
-            document.getElementById('modalTitle').textContent = data ? 'Modifier le projet' : 'Add Project';
+            document.getElementById('modalTitle').textContent = data ? 'Modifier le projet' : 'Ajouter un projet';
             document.getElementById('modal').classList.add('open');
         }
 
@@ -267,13 +267,13 @@
                 seoTitle: document.getElementById('fSeoTitle').value.trim(),
                 seoDescription: ''
             };
-            if (!data.title) { DB.toast('Title is required', 'error'); return; }
+            if (!data.title) { DB.toast('Le titre est obligatoire', 'error'); return; }
             if (id) {
                 DB.update('projects', parseInt(id), data);
-                DB.toast('Project updated');
+                DB.toast('Projet mis à jour');
             } else {
                 DB.add('projects', data);
-                DB.toast('Project added');
+                DB.toast('Projet ajouté');
             }
             closeModal();
             renderTable();
@@ -292,14 +292,14 @@
             copy.title = p.title + ' (copy)';
             copy.featured = false;
             DB.add('projects', copy);
-            DB.toast('Project duplicated');
+            DB.toast('Projet dupliqué');
             renderTable();
         }
 
         function deleteProject(id) {
-            if (!confirm('Delete this project?')) return;
+            if (!confirm('Supprimer ce projet ?')) return;
             DB.delete('projects', id);
-            DB.toast('Project deleted');
+            DB.toast('Projet supprimé');
             renderTable();
         }
 
@@ -307,13 +307,13 @@
             const p = DB.getById('projects', id);
             if (p) {
                 DB.update('projects', id, { status: p.status === 'published' ? 'draft' : 'published' });
-                DB.toast(p.status === 'published' ? 'Project hidden' : 'Project published');
+                DB.toast(p.status === 'published' ? 'Projet masqué' : 'Projet publié');
             }
         }
 
         function exportProjectsData() {
             const data = DB.get('projects');
-            if (!data.length) { DB.toast('No projects to export', 'error'); return; }
+            if (!data.length) { DB.toast('Aucun projet à exporter', 'error'); return; }
             const json = JSON.stringify(data, null, 2);
             const blob = new Blob([json], { type: 'application/json' });
             const a = document.createElement('a');
@@ -321,11 +321,12 @@
             a.download = 'projects-default.json';
             a.click();
             URL.revokeObjectURL(blob);
-            DB.toast('Exported ' + data.length + ' projects');
+            DB.toast('Exported ' + data.length + ' projets');
         }
 
         init();
     </script>
 </body>
 </html>
+
 

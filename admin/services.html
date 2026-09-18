@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -75,7 +75,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
                 <button class="btn btn-primary" onclick="saveService()"><i class="fa-solid fa-check"></i> Save</button>
             </div>
         </div>
@@ -146,7 +146,7 @@
                 image: '',
                 status: 'visible'
             };
-            if (!data.title) { DB.toast('Title is required', 'error'); return; }
+            if (!data.title) { DB.toast('Le titre est obligatoire', 'error'); return; }
             if (id) {
                 DB.update('services', parseInt(id), data);
                 DB.toast('Service updated');
@@ -164,7 +164,7 @@
         }
 
         function deleteService(id) {
-            if (!confirm('Delete this service?')) return;
+            if (!confirm('Supprimer service?')) return;
             DB.delete('services', id);
             DB.toast('Service deleted');
             renderTable();
@@ -192,9 +192,9 @@
             if (dragId === targetId) return;
             let data = getData();
             const ids = data.map(d => d.id);
-            const from = ids.indexOf(dragId);
+            const De = ids.indexOf(dragId);
             const to = ids.indexOf(targetId);
-            ids.splice(from, 1);
+            ids.splice(De, 1);
             ids.splice(to, 0, dragId);
             DB.reorder('services', ids);
             dragId = null;
@@ -205,4 +205,5 @@
     </script>
 </body>
 </html>
+
 

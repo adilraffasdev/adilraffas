@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,10 +14,10 @@
         .badge-src.doctors { background: rgba(3,150,250,0.12); color: var(--secondary); }
         .badge-src.cars { background: rgba(16,185,129,0.12); color: var(--success); }
         .badge-cabinet { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; background: rgba(139,92,246,0.14); color: #8B5CF6; }
-        .badge-website { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
-        .badge-website.yes { background: rgba(16,185,129,0.15); color: var(--success); }
-        .badge-website.no { background: rgba(239,68,68,0.1); color: var(--text-muted); }
-        .badge-city { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; background: rgba(139,92,246,0.12); color: #8B5CF6; display:inline-block; }
+        .badge-Site web { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+        .badge-Site web.yes { background: rgba(16,185,129,0.15); color: var(--success); }
+        .badge-Site web.no { background: rgba(239,68,68,0.1); color: var(--text-muted); }
+        .badge-Ville { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; background: rgba(139,92,246,0.12); color: #8B5CF6; display:inline-block; }
         .call-badge { font-size: 11px; padding: 2px 10px; border-radius: 10px; font-weight: 600; display: inline-block; }
         .call-badge.not_called { background: rgba(100,100,100,0.15); color: var(--text-muted); }
         .call-badge.called { background: rgba(16,185,129,0.15); color: var(--success); }
@@ -31,9 +31,9 @@
         .dec-badge.follow_up { background: rgba(245,158,11,0.12); color: var(--warning); }
         .dec-badge.converted { background: rgba(139,92,246,0.15); color: #8B5CF6; }
         .actions-cell { display: flex; gap: 4px; }
-        .notes-preview { max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--text-muted); font-size: 0.83rem; transition: color 0.15s; }
-        .notes-preview:hover { color: var(--text); }
-        .notes-preview.has-notes { color: var(--text-soft); }
+        .Notes-preview { max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--text-muted); font-size: 0.83rem; transition: color 0.15s; }
+        .Notes-preview:hover { color: var(--text); }
+        .Notes-preview.has-Notes { color: var(--text-soft); }
         .table th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 10px 12px !important; }
         .table td { vertical-align: middle; padding: 10px 12px !important; }
         .client-row:hover td { background: rgba(3,150,250,0.03); }
@@ -68,10 +68,10 @@
             <div class="topbar">
                 <div style="display:flex;align-items:center;gap:12px;">
                     <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
-                    <h2><i class="fa-solid fa-address-book" style="color:var(--secondary);margin-right:8px;"></i>Clients</h2>
+                    <h2><i class="fa-solid fa-Adresse-book" style="color:var(--secondary);margin-right:8px;"></i>Clients</h2>
                 </div>
                 <div class="topbar-actions">
-                    <button class="btn btn-secondary" onclick="importClients()" title="Re-import all clients from spreadsheet"><i class="fa-solid fa-rotate"></i> Reset Data</button>
+                    <button class="btn btn-secondary" onclick="importClients()" title="Re-import all clients De spreadsheet"><i class="fa-solid fa-rotate"></i> Réinitialiser</button>
                     <button class="btn btn-primary" onclick="exportClients()"><i class="fa-solid fa-download"></i> Export CSV</button>
                 </div>
             </div>
@@ -93,7 +93,7 @@
                         </div>
                     </div>
                     <div class="f-group">
-                        <label>City:</label>
+                        <label>Ville:</label>
                         <select id="filterCity" onchange="renderTable()">
                             <option value="">All Cities</option>
                             <option value="Tanger">Tanger</option>
@@ -104,11 +104,11 @@
                         </select>
                     </div>
                     <div class="f-group">
-                        <label>Website:</label>
+                        <label>Site web:</label>
                         <select id="filterWebsite" onchange="renderTable()">
                             <option value="">All</option>
-                            <option value="yes">Has Website</option>
-                            <option value="no">No Website</option>
+                            <option value="yes">Has Site web</option>
+                            <option value="no">No Site web</option>
                         </select>
                     </div>
                     <div class="f-group">
@@ -142,8 +142,8 @@
                                 <th style="width:32px;">#</th>
                                 <th>Client</th>
                                 <th style="width:100px;">Source</th>
-                                <th style="width:80px;">City</th>
-                                <th style="width:90px;">Website</th>
+                                <th style="width:80px;">Ville</th>
+                                <th style="width:90px;">Site web</th>
                                 <th style="width:220px;">Details</th>
                                 <th style="width:120px;">Call Status</th>
                                 <th style="width:120px;">Decision</th>
@@ -172,7 +172,7 @@
                     <div><div id="notesClientName" style="font-weight:600;"></div><div id="notesClientInfo" style="font-size:0.8rem;color:var(--text-muted);"></div></div>
                 </div>
                 <label style="font-size:0.85rem;font-weight:500;color:var(--text-muted);display:block;margin-bottom:6px;">Notes</label>
-                <textarea class="form-control" id="notesText" rows="5" placeholder="Call notes, follow-up details..."></textarea>
+                <textarea class="form-control" id="notesText" rows="5" placeholder="Call Notes, follow-up details..."></textarea>
                 <div style="display:flex;gap:8px;margin-top:10px;">
                     <div style="flex:1;">
                         <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px;">Call Status</label>
@@ -185,7 +185,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeNotesModal()">Cancel</button>
+                <button class="btn btn-secondary" onclick="closeNotesModal()">Annuler</button>
                 <button class="btn btn-primary" onclick="saveNotes()"><i class="fa-solid fa-check"></i> Save</button>
             </div>
         </div>
@@ -209,7 +209,7 @@
                 sourceUrl: c.sourceUrl || '',
                 callStatus: c.callStatus || 'not_called',
                 decision: c.decision || 'pending',
-                notes: c.notes || '',
+                Notes: c.Notes || '',
                 lastCalled: c.lastCalled || '',
             }));
         }
@@ -249,7 +249,7 @@
                         id: existing.id,
                         callStatus: existing.callStatus || def.callStatus || 'not_called',
                         decision: existing.decision || def.decision || 'pending',
-                        notes: existing.notes || def.notes || '',
+                        Notes: existing.Notes || def.Notes || '',
                         lastCalled: existing.lastCalled || def.lastCalled || '',
                     });
                     return;
@@ -266,17 +266,17 @@
                 DB.toast('Spreadsheet data not found', 'error');
                 return;
             }
-            if (!confirm('Reset all client data from spreadsheet? This will overwrite your tracking data.')) return;
+            if (!confirm('Reset all client data De spreadsheet? This will overwrite your tracking data.')) return;
             saveClients(normalizeClients(CLIENTS_DEFAULT));
             render();
-            DB.toast('Reset to ' + CLIENTS_DEFAULT.length + ' clients');
+            DB.toast('Réinitialisé à ' + CLIENTS_DEFAULT.length + ' clients');
         }
 
         function refreshCityOptions(clients) {
             const select = document.getElementById('filterCity');
             const selected = select.value;
-            const cities = [...new Set(clients.map(c => c.city).filter(Boolean))].sort((a, b) => a.localeCompare(b));
-            select.innerHTML = '<option value="">All Cities</option>' + cities.map(city => '<option value="' + esc(city) + '">' + esc(city) + '</option>').join('');
+            const cities = [...new Set(clients.map(c => c.Ville).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+            select.innerHTML = '<option value="">All Cities</option>' + cities.map(Ville => '<option value="' + esc(Ville) + '">' + esc(Ville) + '</option>').join('');
             select.value = cities.includes(selected) ? selected : '';
         }
 
@@ -298,7 +298,7 @@
             const cabinets = clients.filter(c => c.leadType === 'cabinet').length;
             const called = clients.filter(c => c.callStatus !== 'not_called').length;
             const interested = clients.filter(c => c.decision === 'interested' || c.decision === 'converted').length;
-            const withSite = clients.filter(c => c.website && c.website.trim()).length;
+            const withSite = clients.filter(c => c.Site web && c.Site web.trim()).length;
             const notCalled = clients.filter(c => c.callStatus === 'not_called').length;
 
             document.getElementById('clientsStats').innerHTML = `
@@ -306,7 +306,7 @@
                 <div class="stat-card"><div class="stat-icon" style="background:rgba(3,150,250,0.1);color:var(--secondary);"><i class="fa-solid fa-stethoscope"></i></div><div class="stat-info"><h4>Doctors</h4><div class="value">${doctors}</div></div></div>
                 <div class="stat-card"><div class="stat-icon" style="background:rgba(139,92,246,0.1);color:#8B5CF6;"><i class="fa-solid fa-house-medical"></i></div><div class="stat-info"><h4>Cabinets</h4><div class="value">${cabinets}</div></div></div>
                 <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.1);color:var(--success);"><i class="fa-solid fa-car"></i></div><div class="stat-info"><h4>Car Rental</h4><div class="value">${cars}</div></div></div>
-                <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.1);color:var(--success);"><i class="fa-solid fa-globe"></i></div><div class="stat-info"><h4>With Website</h4><div class="value">${withSite}</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.1);color:var(--success);"><i class="fa-solid fa-globe"></i></div><div class="stat-info"><h4>With Site web</h4><div class="value">${withSite}</div></div></div>
                 <div class="stat-card"><div class="stat-icon" style="background:rgba(139,92,246,0.1);color:#8B5CF6;"><i class="fa-solid fa-phone"></i></div><div class="stat-info"><h4>Called</h4><div class="value">${called}</div></div></div>
                 <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,0.1);color:var(--warning);"><i class="fa-solid fa-clock"></i></div><div class="stat-info"><h4>Not Called</h4><div class="value">${notCalled}</div></div></div>
             `;
@@ -319,18 +319,18 @@
 
             if (sourceFilter) clients = clients.filter(c => c.source === sourceFilter);
             const cityFilter = document.getElementById('filterCity').value;
-            if (cityFilter) clients = clients.filter(c => c.city === cityFilter);
+            if (cityFilter) clients = clients.filter(c => c.Ville === cityFilter);
             if (q) clients = clients.filter(c =>
                 (c.name || '').toLowerCase().includes(q) ||
                 (c.phone || '').includes(q) ||
                 (c.category || '').toLowerCase().includes(q) ||
-                (c.address || '').toLowerCase().includes(q) ||
+                (c.Adresse || '').toLowerCase().includes(q) ||
                 (c.cabinetReason || '').toLowerCase().includes(q)
             );
 
             const ws = document.getElementById('filterWebsite').value;
-            if (ws === 'yes') clients = clients.filter(c => c.website && c.website.trim());
-            else if (ws === 'no') clients = clients.filter(c => !c.website || !c.website.trim());
+            if (ws === 'yes') clients = clients.filter(c => c.Site web && c.Site web.trim());
+            else if (ws === 'no') clients = clients.filter(c => !c.Site web || !c.Site web.trim());
 
             const cf = document.getElementById('filterCall').value;
             if (cf) clients = clients.filter(c => c.callStatus === cf);
@@ -357,12 +357,12 @@
                             </div>
                         </td>
                         <td><span class="badge-src ${c.source === 'doctors' ? 'doctors' : 'cars'}"><i class="fa-solid ${c.source === 'doctors' ? 'fa-stethoscope' : 'fa-car'}"></i> ${c.source === 'doctors' ? 'Doctor' : 'Car Rental'}</span></td>
-                        <td><span class="badge-city">${esc(c.city || '-')}</span></td>
-                        <td>${c.website && c.website.trim() ? '<span class="badge-website yes"><i class="fa-solid fa-check"></i> Yes</span>' : '<span class="badge-website no"><i class="fa-solid fa-xmark"></i> No</span>'}</td>
+                        <td><span class="badge-Ville">${esc(c.Ville || '-')}</span></td>
+                        <td>${c.Site web && c.Site web.trim() ? '<span class="badge-Site web yes"><i class="fa-solid fa-check"></i> Yes</span>' : '<span class="badge-Site web no"><i class="fa-solid fa-xmark"></i> No</span>'}</td>
                         <td>
                             <div style="max-width:260px;font-size:0.78rem;color:var(--text-muted);line-height:1.35;">
                                 ${c.category ? '<div style="color:var(--text-soft);font-weight:600;">' + esc(c.category) + '</div>' : ''}
-                                ${c.address ? '<div title="' + esc(c.address) + '">' + esc(c.address.substring(0, 90)) + (c.address.length > 90 ? '...' : '') + '</div>' : ''}
+                                ${c.Adresse ? '<div title="' + esc(c.Adresse) + '">' + esc(c.Adresse.substring(0, 90)) + (c.Adresse.length > 90 ? '...' : '') + '</div>' : ''}
                                 ${c.sourceUrl ? '<a href="' + esc(c.sourceUrl) + '" target="_blank" rel="noopener" style="color:var(--secondary);text-decoration:none;">Source</a>' : ''}
                             </div>
                         </td>
@@ -385,8 +385,8 @@
                             </select>
                         </td>
                         <td>
-                            <span class="notes-preview ${c.notes ? 'has-notes' : ''}" onclick="openNotes(${c.id})" title="${esc(c.notes || '')}">
-                                ${c.notes ? '<i class="fa-solid fa-file-lines" style="margin-right:4px;color:var(--secondary);"></i>' + esc(c.notes.substring(0, 35)) + (c.notes.length > 35 ? '...' : '') : '<span style="font-style:italic;">Add notes</span>'}
+                            <span class="Notes-preview ${c.Notes ? 'has-Notes' : ''}" onclick="openNotes(${c.id})" title="${esc(c.Notes || '')}">
+                                ${c.Notes ? '<i class="fa-solid fa-file-lines" style="margin-right:4px;color:var(--secondary);"></i>' + esc(c.Notes.substring(0, 35)) + (c.Notes.length > 35 ? '...' : '') : '<span style="font-style:italic;">Add Notes</span>'}
                             </span>
                         </td>
                         <td style="font-size:0.83rem;color:var(--text-muted);">${c.lastCalled || '-'}</td>
@@ -423,7 +423,7 @@
             document.getElementById('notesAvatar').textContent = (c.name || '??').substring(0, 2).toUpperCase();
             document.getElementById('notesClientName').textContent = c.name || 'Unknown';
             document.getElementById('notesClientInfo').textContent = (c.source === 'doctors' ? 'Doctor' : 'Car Rental') + (c.phone ? ' · ' + c.phone : '');
-            document.getElementById('notesText').value = c.notes || '';
+            document.getElementById('notesText').value = c.Notes || '';
 
             const callSel = document.getElementById('notesCallStatus');
             callSel.innerHTML = ['not_called','called','no_answer','wrong_number','busy'].map(v =>
@@ -443,7 +443,7 @@
             const clients = getClients();
             const c = clients.find(x => x.id === editingNotesId);
             if (!c) return;
-            c.notes = document.getElementById('notesText').value.trim();
+            c.Notes = document.getElementById('notesText').value.trim();
             c.callStatus = document.getElementById('notesCallStatus').value;
             c.decision = document.getElementById('notesDecision').value;
             if (!c.lastCalled) c.lastCalled = new Date().toISOString().split('T')[0];
@@ -459,26 +459,26 @@
         }
 
         function deleteClient(id) {
-            if (!confirm('Delete this client?')) return;
+            if (!confirm('Supprimer ce client ?')) return;
             const clients = getClients().filter(c => c.id !== id);
             saveClients(clients);
             render();
-            DB.toast('Client deleted');
+            DB.toast('Client supprimé');
         }
 
         function exportClients() {
             const clients = getClients();
-            if (!clients.length) { DB.toast('No clients to export', 'error'); return; }
-            const headers = ['Name','Phone','City','Category','Rating','Reviews','Address','Website','Source','Lead Type','Cabinet Confidence','Cabinet Reason','Source URL','Call Status','Decision','Notes','Last Called'];
+            if (!clients.length) { DB.toast('Aucun client à exporter', 'error'); return; }
+            const headers = ['Name','Phone','Ville','Category','Rating','Reviews','Adresse','Site web','Source','Lead Type','Cabinet Confidence','Cabinet Reason','Source URL','Call Status','Decision','Notes','Last Called'];
             const rows = clients.map(c => [
                 '"' + (c.name || '').replace(/"/g, '""') + '"',
                 c.phone || '',
-                '"' + (c.city || '').replace(/"/g, '""') + '"',
+                '"' + (c.Ville || '').replace(/"/g, '""') + '"',
                 c.category || '',
                 c.rating || '',
                 c.reviews || '',
-                '"' + (c.address || '').replace(/"/g, '""') + '"',
-                c.website || '',
+                '"' + (c.Adresse || '').replace(/"/g, '""') + '"',
+                c.Site web || '',
                 c.source || '',
                 c.leadType || '',
                 c.cabinetConfidence || '',
@@ -486,7 +486,7 @@
                 c.sourceUrl || '',
                 c.callStatus || '',
                 c.decision || '',
-                '"' + (c.notes || '').replace(/"/g, '""') + '"',
+                '"' + (c.Notes || '').replace(/"/g, '""') + '"',
                 c.lastCalled || ''
             ].join(','));
             const csv = '\uFEFF' + headers.join(',') + '\n' + rows.join('\n');
@@ -510,4 +510,5 @@
     </script>
 </body>
 </html>
+
 

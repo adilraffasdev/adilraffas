@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,7 +25,7 @@
                     <h2>Packages / Pricing</h2>
                 </div>
                 <div class="topbar-actions">
-                    <button class="btn btn-primary" onclick="openModal()"><i class="fa-solid fa-plus"></i> Add Package</button>
+                    <button class="btn btn-primary" onclick="openModal()"><i class="fa-solid fa-plus"></i> Ajouter un forfait</button>
                 </div>
             </div>
 
@@ -43,7 +43,7 @@
                         <th>Titre</th>
                         <th>Prix</th>
                         <th>Features</th>
-                        <th style="width:70px">Popular</th>
+                        <th style="width:70px">Populaire</th>
                         <th style="width:70px">Statut</th>
                         <th style="width:160px">Actions</th>
                     </tr></thead>
@@ -57,7 +57,7 @@
     <div class="modal-overlay" id="modal">
         <div class="modal" style="max-width:700px;">
             <div class="modal-header">
-                <h3 id="modalTitle">Add Package</h3>
+                <h3 id="modalTitle">Ajouter un forfait</h3>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
@@ -67,8 +67,8 @@
                     <div class="form-group"><label>Prix</label><input class="form-control" id="fPrice" type="number" required></div>
                     <div class="form-group"><label>Devise</label><input class="form-control" id="fCurrency" value="MAD"></div>
                 </div>
-                <div class="form-group"><label>Description</label><input class="form-control" id="fDesc" placeholder="One-time setup · delivered in 3 days"></div>
-                <div class="form-group"><label>Features (one per line)</label><textarea class="form-control" id="fFeatures" rows="5" placeholder="Simple 1-page website&#10;Mobile-responsive design"></textarea></div>
+                <div class="form-group"><label>Description</label><input class="form-control" id="fDesc" placeholder="Paiement unique setup · delivered in 3 days"></div>
+                <div class="form-group"><label>Features (one per line)</label><textarea class="form-control" id="fFeatures" rows="5" placeholder="Simple 1-page Site web&#10;Mobile-responsive design"></textarea></div>
                 <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
                     <div class="form-group"><label>Button Text</label><input class="form-control" id="fBtnText" placeholder="Choose Basic"></div>
                     <div class="form-group"><label>Button URL</label><input class="form-control" id="fBtnUrl" placeholder="#contact"></div>
@@ -76,12 +76,12 @@
                 </div>
                 <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <label class="form-group" style="display:flex;align-items:center;gap:8px;">
-                        <input type="checkbox" id="fPopular"> Mark as Popular / Best seller
+                        <input type="checkbox" id="fPopular"> Mark as Populaire / Best seller
                     </label>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
                 <button class="btn btn-primary" onclick="savePackage()"><i class="fa-solid fa-check"></i> Save</button>
             </div>
         </div>
@@ -110,9 +110,9 @@
                 <tr draggable="true" data-id="${p.id}">
                     <td class="drag-handle"><i class="fa-solid fa-grip-vertical"></i></td>
                     <td><strong>${p.title}</strong></td>
-                    <td>${p.price ? p.price.toLocaleString() + ' ' + (p.currency || 'MAD') : '-'}</td>
+                    <td>${p.price ? p.price.toLocaleString() + ' ' + (p.Devise || 'MAD') : '-'}</td>
                     <td>${(p.features || []).length} features</td>
-                    <td>${p.popular ? '<span class="badge badge-warning">Best seller</span>' : '-'}</td>
+                    <td>${p.Populaire ? '<span class="badge badge-warning">Best seller</span>' : '-'}</td>
                     <td><label class="toggle"><input type="checkbox" ${p.status === 'visible' ? 'checked' : ''} onchange="toggleStatus(${p.id})"><span class="toggle-slider"></span></label></td>
                     <td>
                         <button class="btn btn-sm btn-secondary" onclick="editPackage(${p.id})"><i class="fa-solid fa-pen"></i></button>
@@ -127,14 +127,14 @@
             document.getElementById('editId').value = data ? data.id : '';
             document.getElementById('fTitle').value = data ? data.title : '';
             document.getElementById('fPrice').value = data ? data.price : '';
-            document.getElementById('fCurrency').value = data ? data.currency : 'MAD';
+            document.getElementById('fCurrency').value = data ? data.Devise : 'MAD';
             document.getElementById('fDesc').value = data ? data.description : '';
             document.getElementById('fFeatures').value = data ? (data.features || []).join('\n') : '';
             document.getElementById('fBtnText').value = data ? data.btnText : 'Choose';
             document.getElementById('fBtnUrl').value = data ? data.btnUrl : '#contact';
             document.getElementById('fAccent').value = data ? data.accentColor : '#005CD8';
-            document.getElementById('fPopular').checked = data ? data.popular : false;
-            document.getElementById('modalTitle').textContent = data ? 'Modifier le forfait' : 'Add Package';
+            document.getElementById('fPopular').checked = data ? data.Populaire : false;
+            document.getElementById('modalTitle').textContent = data ? 'Modifier le forfait' : 'Ajouter un forfait';
             document.getElementById('modal').classList.add('open');
         }
 
@@ -149,22 +149,22 @@
             const data = {
                 title: document.getElementById('fTitle').value.trim(),
                 price: parseFloat(document.getElementById('fPrice').value) || 0,
-                currency: document.getElementById('fCurrency').value.trim() || 'MAD',
+                Devise: document.getElementById('fCurrency').value.trim() || 'MAD',
                 description: document.getElementById('fDesc').value.trim(),
                 features,
                 btnText: document.getElementById('fBtnText').value.trim(),
                 btnUrl: document.getElementById('fBtnUrl').value.trim(),
                 accentColor: document.getElementById('fAccent').value,
-                popular: document.getElementById('fPopular').checked,
+                Populaire: document.getElementById('fPopular').checked,
                 status: 'visible'
             };
-            if (!data.title) { DB.toast('Title is required', 'error'); return; }
+            if (!data.title) { DB.toast('Le titre est obligatoire', 'error'); return; }
             if (id) {
                 DB.update('packages', parseInt(id), data);
-                DB.toast('Package updated');
+                DB.toast('Forfait mis à jour');
             } else {
                 DB.add('packages', data);
-                DB.toast('Package added');
+                DB.toast('Forfait ajouté');
             }
             closeModal();
             renderTable();
@@ -181,16 +181,16 @@
             const copy = { ...p };
             delete copy.id;
             copy.title = p.title + ' (copy)';
-            copy.popular = false;
+            copy.Populaire = false;
             DB.add('packages', copy);
             DB.toast('Package duplicated');
             renderTable();
         }
 
         function deletePackage(id) {
-            if (!confirm('Delete this package?')) return;
+            if (!confirm('Supprimer package?')) return;
             DB.delete('packages', id);
-            DB.toast('Package deleted');
+            DB.toast('Forfait supprimé');
             renderTable();
         }
 
@@ -206,4 +206,5 @@
     </script>
 </body>
 </html>
+
 

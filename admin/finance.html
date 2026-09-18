@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,8 +26,8 @@
                     <h2>Finance</h2>
                 </div>
                 <div class="topbar-actions">
-                    <button class="btn btn-success" onclick="openModal('income')"><i class="fa-solid fa-plus"></i> Add Income</button>
-                    <button class="btn btn-danger" onclick="openModal('expense')"><i class="fa-solid fa-plus"></i> Add Expense</button>
+                    <button class="btn btn-success" onclick="openModal('Revenu')"><i class="fa-solid fa-plus"></i> Add Revenu</button>
+                    <button class="btn btn-danger" onclick="openModal('Dépense')"><i class="fa-solid fa-plus"></i> Add Dépense</button>
                 </div>
             </div>
 
@@ -35,19 +35,19 @@
 
             <div class="charts-grid" style="margin-bottom:24px;">
                 <div class="card">
-                    <div class="card-header"><h3>Income vs Expenses</h3></div>
+                    <div class="card-header"><h3>Revenu vs Expenses</h3></div>
                     <div class="chart-container" id="financeChartContainer"><canvas id="financeChart-canvas"></canvas></div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><h3>Monthly Profit</h3></div>
+                    <div class="card-header"><h3>Mensuel Profit</h3></div>
                     <div class="chart-container" id="financeProfitChartContainer"><canvas id="financeProfitChart-canvas"></canvas></div>
                 </div>
             </div>
 
             <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
                 <button class="btn btn-sm btn-primary" id="filterAll" onclick="setFilter('all')">All</button>
-                <button class="btn btn-sm btn-success" id="filterIncome" onclick="setFilter('income')">Income</button>
-                <button class="btn btn-sm btn-danger" id="filterExpense" onclick="setFilter('expense')">Expense</button>
+                <button class="btn btn-sm btn-success" id="filterIncome" onclick="setFilter('Revenu')">Revenu</button>
+                <button class="btn btn-sm btn-danger" id="filterExpense" onclick="setFilter('Dépense')">Dépense</button>
             </div>
 
             <div class="card">
@@ -80,10 +80,10 @@
                 <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="form-group"><label>Catégorie</label>
                         <select class="form-control" id="fCategory">
-                            <option value="Web Development">Web Development</option>
-                            <option value="Mobile App">Mobile App</option>
+                            <option value="Développement Web">Développement Web</option>
+                            <option value="Application Mobile">Application Mobile</option>
                             <option value="Branding">Branding</option>
-                            <option value="Digital Marketing">Digital Marketing</option>
+                            <option value="Marketing Digital">Marketing Digital</option>
                             <option value="ERP">ERP</option>
                             <option value="Subscriptions">Subscriptions</option>
                             <option value="Marketing">Marketing</option>
@@ -97,7 +97,7 @@
                 <div class="form-group"><label>Date</label><input class="form-control" id="fDate" type="date"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
                 <button class="btn btn-primary" onclick="saveTransaction()"><i class="fa-solid fa-check"></i> Save</button>
             </div>
         </div>
@@ -123,14 +123,14 @@
 
         function render() {
             const transactions = getFinance();
-            const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-            const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+            const totalIncome = transactions.filter(t => t.type === 'Revenu').reduce((s, t) => s + t.amount, 0);
+            const totalExpenses = transactions.filter(t => t.type === 'Dépense').reduce((s, t) => s + t.amount, 0);
             const netProfit = totalIncome - totalExpenses;
 
             document.getElementById('financeStats').innerHTML = `
-                <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:var(--success);"><i class="fa-solid fa-arrow-down"></i></div><div class="stat-info"><h4>Total Income</h4><div class="value">${totalIncome.toLocaleString()} MAD</div></div></div>
-                <div class="stat-card"><div class="stat-icon" style="background:rgba(239,68,68,0.15);color:var(--danger);"><i class="fa-solid fa-arrow-up"></i></div><div class="stat-info"><h4>Total Expenses</h4><div class="value">${totalExpenses.toLocaleString()} MAD</div></div></div>
-                <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:var(--success);"><i class="fa-solid fa-coins"></i></div><div class="stat-info"><h4>Net Profit</h4><div class="value">${netProfit.toLocaleString()} MAD</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:var(--success);"><i class="fa-solid fa-arrow-down"></i></div><div class="stat-info"><h4>Total Revenu</h4><div class="value">${totalIncome.toLocaleString()} MAD</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(239,68,68,0.15);color:var(--danger);"><i class="fa-solid fa-arrow-up"></i></div><div class="stat-info"><h4>Dépenses totales</h4><div class="value">${totalExpenses.toLocaleString()} MAD</div></div></div>
+                <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:var(--success);"><i class="fa-solid fa-coins"></i></div><div class="stat-info"><h4>Bénéfice net</h4><div class="value">${netProfit.toLocaleString()} MAD</div></div></div>
             `;
 
             // Charts
@@ -138,14 +138,14 @@
             const monthData = {};
             transactions.forEach(t => {
                 const m = t.date.substring(0, 7);
-                if (!monthData[m]) monthData[m] = { income: 0, expense: 0 };
-                if (t.type === 'income') monthData[m].income += t.amount;
-                else monthData[m].expense += t.amount;
+                if (!monthData[m]) monthData[m] = { Revenu: 0, Dépense: 0 };
+                if (t.type === 'Revenu') monthData[m].Revenu += t.amount;
+                else monthData[m].Dépense += t.amount;
             });
             const labels = Object.keys(monthData).sort();
-            const incomeData = labels.map(m => monthData[m].income);
-            const expenseData = labels.map(m => monthData[m].expense);
-            const profitData = labels.map(m => monthData[m].income - monthData[m].expense);
+            const incomeData = labels.map(m => monthData[m].Revenu);
+            const expenseData = labels.map(m => monthData[m].Dépense);
+            const profitData = labels.map(m => monthData[m].Revenu - monthData[m].Dépense);
 
             if (window.financeChart) window.financeChart.destroy();
             if (window.financeProfitChart) window.financeProfitChart.destroy();
@@ -158,7 +158,7 @@
                 window.financeChart = new Chart(document.getElementById('financeChart-canvas'), {
                     type: 'bar',
                     data: { labels, datasets: [
-                        { label: 'Income', data: incomeData, backgroundColor: 'rgba(16,185,129,0.6)', borderColor: '#10b981', borderWidth: 1 },
+                        { label: 'Revenu', data: incomeData, backgroundColor: 'rgba(16,185,129,0.6)', borderColor: '#10b981', borderWidth: 1 },
                         { label: 'Expenses', data: expenseData, backgroundColor: 'rgba(239,68,68,0.6)', borderColor: '#ef4444', borderWidth: 1 }
                     ]},
                     options: { responsive: true, maintainAspectRatio: false,
@@ -201,10 +201,10 @@
                 ? transactions.map(t => `
                     <tr>
                         <td style="font-size:0.85rem;color:var(--text-muted);">${t.date}</td>
-                        <td>${t.type === 'income' ? '<span class="badge badge-success">Income</span>' : '<span class="badge badge-danger">Expense</span>'}</td>
+                        <td>${t.type === 'Revenu' ? '<span class="badge badge-success">Revenu</span>' : '<span class="badge badge-danger">Dépense</span>'}</td>
                         <td>${t.category || '-'}</td>
                         <td>${t.description}</td>
-                        <td style="text-align:right;font-weight:600;color:${t.type === 'income' ? 'var(--success)' : 'var(--danger)'};">${t.type === 'income' ? '+' : '-'}${t.amount.toLocaleString()} MAD</td>
+                        <td style="text-align:right;font-weight:600;color:${t.type === 'Revenu' ? 'var(--success)' : 'var(--danger)'};">${t.type === 'Revenu' ? '+' : '-'}${t.amount.toLocaleString()} MAD</td>
                         <td>
                             <button class="btn btn-sm btn-secondary" onclick="editTransaction(${t.id})"><i class="fa-solid fa-pen"></i></button>
                             <button class="btn btn-sm btn-danger" onclick="deleteTransaction(${t.id})"><i class="fa-solid fa-trash"></i></button>
@@ -216,9 +216,9 @@
 
         function setFilter(type) {
             filterType = type;
-            ['all','income','expense'].forEach(t => {
+            ['all','Revenu','Dépense'].forEach(t => {
                 const btn = document.getElementById('filter' + t.charAt(0).toUpperCase() + t.slice(1));
-                if (btn) btn.className = 'btn btn-sm ' + (t === type ? (t === 'income' ? 'btn-success' : t === 'expense' ? 'btn-danger' : 'btn-primary') : 'btn-secondary');
+                if (btn) btn.className = 'btn btn-sm ' + (t === type ? (t === 'Revenu' ? 'btn-success' : t === 'Dépense' ? 'btn-danger' : 'btn-primary') : 'btn-secondary');
             });
             renderTable();
         }
@@ -227,10 +227,10 @@
             document.getElementById('editId').value = '';
             document.getElementById('fType').value = type;
             document.getElementById('fDesc').value = '';
-            document.getElementById('fCategory').value = type === 'income' ? 'Web Development' : 'Marketing';
+            document.getElementById('fCategory').value = type === 'Revenu' ? 'Développement Web' : 'Marketing';
             document.getElementById('fAmount').value = '';
             document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('modalTitle').textContent = type === 'income' ? 'Add Income' : 'Add Expense';
+            document.getElementById('modalTitle').textContent = type === 'Revenu' ? 'Add Revenu' : 'Add Dépense';
             document.getElementById('modal').classList.add('open');
         }
 
@@ -252,11 +252,11 @@
             if (id) {
                 const idx = finance.transactions.findIndex(t => t.id === parseInt(id));
                 if (idx !== -1) finance.transactions[idx] = { ...finance.transactions[idx], ...data };
-                DB.toast('Transaction updated');
+                DB.toast('Transaction mise à jour');
             } else {
                 data.id = Date.now() + Math.floor(Math.random() * 1000);
                 finance.transactions.push(data);
-                DB.toast('Transaction added');
+                DB.toast('Transaction ajoutée');
             }
             DB.set('finance', finance);
             closeModal();
@@ -273,14 +273,14 @@
             document.getElementById('fCategory').value = t.category || 'Other';
             document.getElementById('fAmount').value = t.amount;
             document.getElementById('fDate').value = t.date;
-            document.getElementById('modalTitle').textContent = 'Edit ' + (t.type === 'income' ? 'Income' : 'Expense');
+            document.getElementById('modalTitle').textContent = 'Edit ' + (t.type === 'Revenu' ? 'Revenu' : 'Dépense');
             document.getElementById('modal').classList.add('open');
         }
 
         function deleteTransaction(id) {
-            if (!confirm('Delete this transaction?')) return;
+            if (!confirm('Supprimer transaction?')) return;
             DB.delete('finance', id);
-            DB.toast('Transaction deleted');
+            DB.toast('Transaction supprimée');
             render();
         }
 
@@ -288,4 +288,5 @@
     </script>
 </body>
 </html>
+
 

@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -54,7 +54,7 @@
             <div class="modal-body">
                 <input type="hidden" id="editId">
                 <div class="form-group"><label>Author / Client Name</label><input class="form-control" id="fAuthor" required></div>
-                <div class="form-group"><label>Role / Company</label><input class="form-control" id="fRole"></div>
+                <div class="form-group"><label>Role / Société</label><input class="form-control" id="fRole"></div>
                 <div class="form-group"><label>Quote</label><textarea class="form-control" id="fQuote" rows="3" required></textarea></div>
                 <div class="form-group"><label>Avatar Initials</label><input class="form-control" id="fAvatar" maxlength="4" placeholder="e.g. ET"></div>
                 <div class="form-group"><label>Gradient Color</label>
@@ -77,8 +77,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveTestimonial()">Save</button>
+                <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+                <button class="btn btn-primary" onclick="saveTestimonial()">Enregistrer</button>
             </div>
         </div>
     </div>
@@ -171,7 +171,7 @@
         }
 
         function deleteTestimonial(id) {
-            if (!confirm('Delete this testimonial?')) return;
+            if (!confirm('Supprimer testimonial?')) return;
             DB.delete('testimonials', id);
             DB.toast('Testimonial deleted');
             renderTable();
@@ -190,4 +190,5 @@
     </script>
 </body>
 </html>
+
 

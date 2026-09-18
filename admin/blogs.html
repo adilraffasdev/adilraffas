@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,10 +25,10 @@
                     <h2>Blog Posts</h2>
                 </div>
                 <div class="topbar-actions">
-                    <button class="btn btn-secondary" onclick="document.getElementById('importFileInput').click()" title="Import blogs from JSON file"><i class="fa-solid fa-upload"></i> Import JSON</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('importFileInput').click()" title="Import blogs De JSON file"><i class="fa-solid fa-upload"></i> Importer JSON</button>
                     <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importBlogsFromFile(this)">
-                    <button class="btn btn-secondary" onclick="importBlogs()" title="Reset to default blog posts"><i class="fa-solid fa-rotate"></i> Reset Data</button>
-                    <button class="btn btn-secondary" onclick="exportBlogsData()" title="Export all blogs as JSON"><i class="fa-solid fa-download"></i> Export Data</button>
+                    <button class="btn btn-secondary" onclick="importBlogs()" title="Reset to default blog posts"><i class="fa-solid fa-rotate"></i> Réinitialiser</button>
+                    <button class="btn btn-secondary" onclick="exportBlogsData()" title="Export all blogs as JSON"><i class="fa-solid fa-download"></i> Exporter</button>
                     <button class="btn btn-primary" onclick="addBlog()"><i class="fa-solid fa-plus"></i> Add Blog</button>
                 </div>
             </div>
@@ -69,16 +69,16 @@
                     <div class="form-group"><label>Titre</label><input class="form-control" id="fTitle" required></div>
                     <div class="form-group"><label>Catégorie</label>
                         <select class="form-control" id="fCategory">
-                            <option value="Web Development">Web Development</option>
+                            <option value="Développement Web">Développement Web</option>
                             <option value="Branding">Branding</option>
-                            <option value="Digital Marketing">Digital Marketing</option>
+                            <option value="Marketing Digital">Marketing Digital</option>
                             <option value="Business">Business</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="form-group"><label>Slug</label><input class="form-control" id="fSlug" placeholder="auto-generated"></div>
-                    <div class="form-group"><label>Image URL</label><input class="form-control" id="fImage" placeholder="https://..."><div style="margin-top:6px;display:flex;align-items:center;gap:8px;"><label for="fImageUpload" style="font-size:0.8rem;cursor:pointer;color:var(--secondary);"><i class="fa-solid fa-upload"></i> Upload file</label><input type="file" id="fImageUpload" accept="image/*" style="display:none;" onchange="handleImageUpload(this)"></div></div>
+                    <div class="form-group"><label>Image URL</label><input class="form-control" id="fImage" placeholder="https://..."><div style="margin-top:6px;display:flex;align-items:center;gap:8px;"><label for="fImageUpload" style="font-size:0.8rem;cursor:pointer;color:var(--secondary);"><i class="fa-solid fa-upload"></i> Télécharger un fichier</label><input type="file" id="fImageUpload" accept="image/*" style="display:none;" onchange="handleImageUpload(this)"></div></div>
                 </div>
                 <div id="fImagePreview" style="display:none;margin-bottom:12px;"><img style="max-width:200px;border-radius:8px;border:1px solid var(--border);"></div>
                 <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -90,11 +90,11 @@
                 <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
                     <div class="form-group"><label>Author</label><input class="form-control" id="fAuthor" value="Adil Raffas"></div>
                     <div class="form-group"><label>Reading Time</label><input class="form-control" id="fReadingTime" placeholder="5 min"></div>
-                    <div class="form-group"><label>SEO Title</label><input class="form-control" id="fSeoTitle"></div>
+                    <div class="form-group"><label>Titre SEO</label><input class="form-control" id="fSeoTitle"></div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
                 <button class="btn btn-secondary" onclick="saveDraft()"><i class="fa-solid fa-file"></i> Save Draft</button>
                 <button class="btn btn-primary" onclick="saveBlog()"><i class="fa-solid fa-check"></i> Publish</button>
             </div>
@@ -130,7 +130,7 @@
                     renderTable();
                     DB.toast(data.length + ' blog posts imported');
                 } catch (err) {
-                    DB.toast('Invalid JSON file: ' + err.message, 'error');
+                    DB.toast('Fichier JSON invalide: ' + err.message, 'error');
                 }
             };
             reader.readAsText(file);
@@ -145,7 +145,7 @@
             if (!confirm('Reset all blog posts to default data? This will overwrite your changes.')) return;
             DB.set('blogs', BLOGS_DEFAULT);
             renderTable();
-            DB.toast('Reset to ' + BLOGS_DEFAULT.length + ' blog posts');
+            DB.toast('Réinitialisé à ' + BLOGS_DEFAULT.length + ' blog posts');
         }
 
         function getData() {
@@ -175,7 +175,7 @@
         function openModal(data) {
             document.getElementById('editId').value = data ? data.id : '';
             document.getElementById('fTitle').value = data ? data.title : '';
-            document.getElementById('fCategory').value = data ? data.category : 'Web Development';
+            document.getElementById('fCategory').value = data ? data.category : 'Développement Web';
             document.getElementById('fSlug').value = data ? data.slug : '';
             const img = data ? data.featuredImage || '' : '';
             document.getElementById('fImage').value = img;
@@ -246,7 +246,7 @@
             const id = document.getElementById('editId').value;
             const data = collectData();
             data.status = 'published';
-            if (!data.title) { DB.toast('Title is required', 'error'); return; }
+            if (!data.title) { DB.toast('Le titre est obligatoire', 'error'); return; }
             if (id) {
                 DB.update('blogs', parseInt(id), data);
                 DB.toast('Blog published');
@@ -262,7 +262,7 @@
             const id = document.getElementById('editId').value;
             const data = collectData();
             data.status = 'draft';
-            if (!data.title) { DB.toast('Title is required', 'error'); return; }
+            if (!data.title) { DB.toast('Le titre est obligatoire', 'error'); return; }
             if (id) {
                 DB.update('blogs', parseInt(id), data);
                 DB.toast('Draft saved');
@@ -280,7 +280,7 @@
         }
 
         function deleteBlog(id) {
-            if (!confirm('Delete this blog post?')) return;
+            if (!confirm('Supprimer blog post?')) return;
             DB.delete('blogs', id);
             DB.toast('Blog deleted');
             renderTable();
@@ -303,4 +303,5 @@
     </script>
 </body>
 </html>
+
 
