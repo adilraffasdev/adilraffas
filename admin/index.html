@@ -35,18 +35,18 @@
 
             <div class="charts-grid">
                 <div class="card">
-                    <div class="card-header"><h3>Profit by Category</h3></div>
+                    <div class="card-header"><h3>Profit par catégorie</h3></div>
                     <div class="chart-container" id="categoryChartContainer"><canvas id="categoryChart-canvas"></canvas></div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><h3>Mensuel Profit</h3></div>
+                    <div class="card-header"><h3>Profit mensuel</h3></div>
                     <div class="chart-container" id="profitChartContainer"><canvas id="profitChart-canvas"></canvas></div>
                 </div>
             </div>
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                 <div class="card">
-                    <div class="card-header"><h3>Recent Activity</h3></div>
+                    <div class="card-header"><h3>Activité récente</h3></div>
                     <div id="recentActivity" style="font-size:0.85rem;color:var(--text-muted);"></div>
                 </div>
                 <div class="card">
@@ -66,7 +66,7 @@
     <script src="js/layout.js?2"></script>
     <script src="js/db.js?2"></script>
     <script>
-        initLayout('Tableau de bord');
+        initLayout('dashboard');
 
         async function init() {
             await DB.init();
@@ -78,8 +78,8 @@
             const finance = DB.get('finance');
             const transactions = finance.transactions || [];
 
-            const totalIncome = transactions.filter(t => t.type === 'Revenu').reduce((s, t) => s + t.amount, 0);
-            const totalExpenses = transactions.filter(t => t.type === 'Dépense').reduce((s, t) => s + t.amount, 0);
+            const totalIncome = transactions.filter(t => t.type === 'Income').reduce((s, t) => s + t.amount, 0);
+            const totalExpenses = transactions.filter(t => t.type === 'Expense').reduce((s, t) => s + t.amount, 0);
             const netProfit = totalIncome - totalExpenses;
 
             document.getElementById('statsGrid').innerHTML = `
@@ -100,22 +100,22 @@
             const monthData = {};
             transactions.forEach(t => {
                 const m = t.date.substring(0, 7);
-                if (!monthData[m]) monthData[m] = { Revenu: 0, Dépense: 0 };
-                if (t.type === 'Revenu') monthData[m].Revenu += t.amount;
-                else monthData[m].Dépense += t.amount;
+                if (!monthData[m]) monthData[m] = { Income: 0, Expense: 0 };
+                if (t.type === 'Income') monthData[m].Income += t.amount;
+                else monthData[m].Expense += t.amount;
             });
             const labels = Object.keys(monthData).sort();
-            const incomeData = labels.map(m => monthData[m].Revenu);
-            const expenseData = labels.map(m => monthData[m].Dépense);
-            const profitData = labels.map(m => monthData[m].Revenu - monthData[m].Dépense);
+            const incomeData = labels.map(m => monthData[m].Income);
+            const expenseData = labels.map(m => monthData[m].Expense);
+            const profitData = labels.map(m => monthData[m].Income - monthData[m].Expense);
 
             // Profit by category
             const catMap = {};
             transactions.forEach(t => {
                 const cat = t.category || 'Other';
-                if (!catMap[cat]) catMap[cat] = { Revenu: 0, Dépense: 0 };
-                if (t.type === 'Revenu') catMap[cat].Revenu += t.amount;
-                else catMap[cat].Dépense += t.amount;
+                if (!catMap[cat]) catMap[cat] = { Income: 0, Expense: 0 };
+                if (t.type === 'Income') catMap[cat].Income += t.amount;
+                else catMap[cat].Expense += t.amount;
             });
             const catLabels = Object.keys(catMap).sort();
             const catColors = ['#0396FA','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#14b8a6','#f97316','#6366f1','#84cc16'];
@@ -125,7 +125,7 @@
                 document.getElementById('categoryChartContainer').style.display = 'block';
                 document.getElementById('categoryChartContainer').innerHTML = '<canvas id="categoryChart-canvas"></canvas>';
                 document.querySelectorAll('.charts-grid .card .chart-empty').forEach(c => c.remove());
-                const catProfit = catLabels.map(c => catMap[c].Revenu - catMap[c].Dépense);
+                const catProfit = catLabels.map(c => catMap[c].Income - catMap[c].Expense);
                 new Chart(document.getElementById('categoryChart-canvas'), {
                     type: 'doughnut',
                     data: { labels: catLabels, datasets: [{ data: catProfit.map(v => Math.abs(v)), backgroundColor: catBg }] },
@@ -173,7 +173,7 @@
             document.getElementById('recentActivity').innerHTML = recent.length
                 ? recent.map(t => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
                     <span>${t.description}</span>
-                    <span style="color:${t.type === 'Revenu' ? 'var(--success)' : 'var(--danger)'};">${t.type === 'Revenu' ? '+' : '-'}${t.amount.toLocaleString()} MAD</span>
+                    <span style="color:${t.type === 'Income' ? 'var(--success)' : 'var(--danger)'};">${t.type === 'Income' ? '+' : '-'}${t.amount.toLocaleString()} MAD</span>
                 </div>`).join('')
                 : '<p style="padding:16px;text-align:center;">No transactions yet</p>';
         }
@@ -181,5 +181,6 @@
     </script>
 </body>
 </html>
+
 
 
