@@ -16,7 +16,7 @@
     .login-card p{color:var(--text-muted);font-size:.85rem;margin-bottom:28px}
     .btn-login{display:inline-flex;align-items:center;gap:10px;background:#005CD8;color:#fff;border:none;padding:13px 28px;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s;width:100%;justify-content:center}
     .btn-login:hover{background:#0045a0}
-    .loading{color:var(--text-muted);font-size:.85rem;margin-top:16px;display:none}
+    .msg{color:var(--text-muted);font-size:.85rem;margin-top:16px}
   </style>
 </head>
 <body class="login-page">
@@ -27,26 +27,38 @@
     <button class="btn-login" id="loginBtn">
       <i class="fa-solid fa-right-to-bracket"></i> Sign In
     </button>
-    <p class="loading" id="loadingMsg">Signing in...</p>
+    <p class="msg" id="msg"></p>
   </div>
 
   <script>
-    // If already logged in, go directly to dashboard
-    netlifyIdentity.on('init', function(user) {
-      if (user) {
-        window.location.replace('/admin/index.html');
-      }
-    });
+    var SESSION_KEY = 'ar_admin_session';
 
-    // On successful login
+    // If already has valid session, go to dashboard immediately
+    var existing = localStorage.getItem(SESSION_KEY);
+    if (existing) {
+      try {
+        var d = JSON.parse(existing);
+        if (Date.now() - d.time < 86400000) {
+          window.location.replace('/admin/index.html');
+        } else {
+          localStorage.removeItem(SESSION_KEY);
+        }
+      } catch(e) {
+        localStorage.removeItem(SESSION_KEY);
+      }
+    }
+
+    // On successful Netlify Identity login — set session and redirect
     netlifyIdentity.on('login', function(user) {
       netlifyIdentity.close();
-      document.getElementById('loginBtn').style.display = 'none';
-      document.getElementById('loadingMsg').style.display = 'block';
-      // Small delay to let the session settle
-      setTimeout(function() {
-        window.location.replace('/admin/index.html');
-      }, 800);
+      // Store session with timestamp
+      localStorage.setItem(SESSION_KEY, JSON.stringify({
+        user: user.email,
+        time: Date.now()
+      }));
+      document.getElementById('msg').textContent = 'Redirecting...';
+      document.getElementById('loginBtn').disabled = true;
+      window.location.replace('/admin/index.html');
     });
 
     document.getElementById('loginBtn').addEventListener('click', function() {
